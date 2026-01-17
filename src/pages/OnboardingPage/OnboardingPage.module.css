@@ -1,0 +1,167 @@
+.page {
+  min-height: 100vh;
+  background: #1e1e1e;
+  padding: 40px 80px 80px;
+  color: #ffffff;
+}
+
+.section {
+  margin-bottom: 40px;
+}
+
+.sectionTitle {
+  margin-bottom: 14px;
+  font-size: 28px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.titleEditBtn {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  border-radius: 16px;
+  padding: 6px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.titleEditBtn:hover {
+  opacity: 1;
+}
+
+/* I AM */
+.iamBox {
+  background: #ffffff;
+  color: #1e1e1e;
+  border-radius: 10px;
+  padding: 32px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.iamText {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.editButton {
+  background: #883376;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 16px 36px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* Item Grid */
+.itemGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+.itemCard {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.itemCard .thumb {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+}
+
+.itemCard .info {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  padding: 16px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.itemCard:hover .info {
+  opacity: 1;
+}
+
+.itemCard .title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.itemCard .subtitle {
+  font-size: 18px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Empty State */
+.emptyState {
+  border: 2px dashed #444;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  color: #a0a0a0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #2a2a2a;
+  font-size: 20px;
+}
+.emptyState:hover {
+  background: #3a3a3a;
+  border-color: #883376;
+}
+
+/* Save Button */
+.saveButton {
+  margin: 60px auto 0;
+  display: block;
+  width: 180px;
+  height: 50px;
+  border-radius: 25px;
+  border: none;
+  background: #883376;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Footer */
+.footer {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .page {
+    padding: 24px;
+  }
+}

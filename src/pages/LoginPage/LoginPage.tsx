@@ -21,17 +21,15 @@ export default function LoginPage() {
       {/* 우측 영역 */}
       <section className={styles.right}>
         <div className={styles.rightInner}>
-          <div className={styles.content}>
-            <img className={styles.logoText} src={logoText} alt="D_MARA" />
+          <img className={styles.logoText} src={logoText} alt="D_MARA" />
 
-            <button
-              className={styles.googleButton}
-              onClick={handleGoogleLogin}
-              type="button"
-            >
-              <img src={googleBtn} alt="Continue with Google" />
-            </button>
-          </div>
+          <button
+            className={styles.googleButton}
+            onClick={handleGoogleLogin}
+            type="button"
+          >
+            <img src={googleBtn} alt="Continue with Google" />
+          </button>
 
           <p className={styles.footer}>© 2026 D_MARA. All Rights Reserved.</p>
         </div>
