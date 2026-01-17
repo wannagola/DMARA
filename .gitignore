@@ -1,0 +1,28 @@
+# =========================
+# Django (Backend) 무시 파일
+# =========================
+# 1. 파이썬 컴파일 파일 (무조건 무시)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 2. 가상환경 폴더 (내 컴퓨터 설정이 올라가면 안 됨)
+venv/
+.venv/
+env/
+server/venv/
+
+# 3. 로컬 데이터베이스 (팀원끼리 공유 X, 각자 로컬에서 생성)
+db.sqlite3
+db.sqlite3-journal
+
+# 4. 보안 파일 (API 키 등이 들어있으므로 절대 올리면 안 됨!)
+secrets.json
+my_settings.py
+
+# 5. 유저가 업로드한 미디어 파일 (보통 서버에만 저장함)
+media/
+server/media/
+
+# 6. 수집된 스태틱 파일 (배포용이라 개발 중엔 무시)
+staticfiles/
