@@ -1,0 +1,117 @@
+/* ===== Overlay (뒤 흐리게/어둡게) ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 999;
+}
+
+/* ===== Modal Box ===== */
+.modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(640px, calc(100vw - 48px));
+  background: #2a2a2a;
+  border-radius: 18px;
+  border: 1px solid rgba(136, 51, 118, 0.35);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.header {
+  position: relative;
+  padding: 22px 22px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.closeBtn {
+  position: absolute;
+  right: 16px;
+  top: 14px;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(136, 51, 118, 0.45);
+  color: #fff;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.content {
+  padding: 18px 22px 22px;
+}
+
+/* ===== Modal Form UI (I AM 편집에 사용) ===== */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.input {
+  height: 52px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.22);
+  color: #ffffff;
+  padding: 0 16px;
+  outline: none;
+  font-size: 16px;
+}
+
+.input:focus {
+  border-color: rgba(136, 51, 118, 0.75);
+  box-shadow: 0 0 0 4px rgba(136, 51, 118, 0.18);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.ghostBtn {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.92);
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.primaryBtn {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 10px;
+  border: none;
+  background: #883376;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 16px;
+}
