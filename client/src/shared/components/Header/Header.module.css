@@ -1,0 +1,86 @@
+.header {
+  height: 96px;
+  background: #883376;
+  color: #fff;
+  display: flex;
+  align-items: center;
+}
+
+.inner {
+  width: 100%;
+  padding: 0 40px;
+  display: grid;
+  grid-template-columns: 200px 1fr 220px;
+  align-items: center;
+  gap: 16px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 200px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: 320px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.navItem {
+  color: rgba(255, 255, 255, 0.95);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.active {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.username {
+  font-size: 18px;
+  font-weight: 600;
+  padding-right: 40px;
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .inner {
+    grid-template-columns: 120px 1fr 120px;
+  }
+
+  .nav {
+    gap: 22px;
+    font-size: 16px;
+  }
+
+  .username {
+    display: none;
+  }
+}

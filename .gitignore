@@ -1,3 +1,38 @@
+<<<<<<< HEAD
+=======
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Vite cache
+.vite/
+
+# env files
+.env
+.env.*
+
+>>>>>>> 313ab0b7ccfa9317f46e80b63f0b1aa81bb32ce5
 # =========================
 # Django (Backend) 무시 파일
 # =========================
@@ -25,4 +60,8 @@ media/
 server/media/
 
 # 6. 수집된 스태틱 파일 (배포용이라 개발 중엔 무시)
+<<<<<<< HEAD
 staticfiles/
+=======
+staticfiles/
+>>>>>>> 313ab0b7ccfa9317f46e80b63f0b1aa81bb32ce5
