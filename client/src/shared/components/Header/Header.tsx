@@ -5,10 +5,6 @@ import logo from "@/assets/header/dmara_logo.png"; // ✅ 임시: 너의 좌측 
 
 import defaultAvatar from "/vite.svg";
 
-type Props = {
-  username?: string;
-};
-
 export default function Header() {
   const navigate = useNavigate();
   // 1. 상태 추가 (이름, 프로필 사진)

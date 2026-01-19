@@ -9,10 +9,10 @@
 .modal {
   position: fixed;
   left: 50%;
-  top: 50%; /* Adjusted top to center vertically */
+  top: 50%;
   transform: translate(-50%, -50%);
   width: min(900px, calc(100% - 80px));
-  max-height: calc(100% - 60px); /* Increased max-height */
+  max-height: calc(100% - 60px);
   background: #232323;
   border-radius: 34px;
   border: 1px solid rgba(136, 51, 118, 0.55);
@@ -20,8 +20,8 @@
   z-index: 1000;
   padding: 46px 64px 40px;
   color: #fff;
-  display: flex; /* Added flexbox for layout */
-  flex-direction: column; /* Stack children vertically */
+  display: flex;
+  flex-direction: column;
 }
 
 .close {
@@ -45,17 +45,17 @@
   font-weight: 900;
   letter-spacing: 0.02em;
   margin: 0 0 36px;
-  flex-shrink: 0; /* Prevent headline from shrinking */
+  flex-shrink: 0;
 }
 
 .form {
   display: flex;
   flex-direction: column;
   gap: 26px;
-  overflow-y: auto; /* Make form scrollable */
-  flex: 1; /* Allow form to take available vertical space */
-  padding-right: 10px; /* Add padding for scrollbar if present */
-  margin-bottom: 20px; /* Space before actions */
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 10px;
+  margin-bottom: 20px;
 }
 
 .row {
@@ -94,22 +94,6 @@
   padding: 6px 0;
 }
 
-.input[type="date"] {
-  position: relative;
-  /* color styles are removed as they are handled by the calendarIcon */
-}
-
-/* Hide the native calendar picker indicator */
-.input[type="date"]::-webkit-calendar-picker-indicator {
-  opacity: 0;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-}
-
 .select {
   width: 100%;
   border: none;
@@ -122,47 +106,46 @@
   appearance: none;
 }
 
-/* Styling for the custom calendar icon */
 .calendarIcon {
   position: absolute;
   right: 4px;
   top: 50%;
   transform: translateY(-50%);
-  width: 40px; /* Larger icon size */
+  width: 40px;
   height: 40px;
-  border: 3px solid #883376; /* Purple border */
+  border: 3px solid #883376;
   border-radius: 4px;
-  pointer-events: none; /* Allow clicks to pass through to the input */
+  pointer-events: none;
 }
 
 .calendarIcon::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -3px;
   left: 50%;
   transform: translateX(-50%);
   width: 60%;
   height: 3px;
-  background-color: #883376; /* Purple top bar */
+  background-color: #883376;
 }
 
 .calendarIcon::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 40%;
   height: 3px;
-  background-color: #883376; /* Purple horizontal bar */
+  background-color: #883376;
 }
 
 .commentArea {
   position: relative;
   margin-top: 8px;
-  display: flex; /* Use flexbox */
-  flex-direction: column; /* Stack children vertically */
-  gap: 10px; /* Space between previewBox and uploadBtn */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .textarea {
@@ -183,7 +166,7 @@
 .previewBox {
   margin-top: 26px;
   width: 100%;
-  height: 200px; /* Reduced height to give space */
+  height: 200px;
   border-radius: 18px;
   background: #141414;
   overflow: hidden;
@@ -202,8 +185,7 @@
 }
 
 .uploadBtn {
-  position: static; /* Remove absolute positioning */
-  /* Remove top, left, transform properties */
+  position: static;
   font-size: 16px;
   font-weight: 800;
   color: rgba(255, 255, 255, 0.9);
@@ -212,8 +194,8 @@
   padding: 10px 14px;
   border-radius: 12px;
   cursor: pointer;
-  align-self: flex-start; /* Align to start in flex column */
-  width: fit-content; /* Adjust width to content */
+  align-self: flex-start;
+  width: fit-content;
 }
 
 .file {
@@ -243,6 +225,104 @@
   cursor: not-allowed;
 }
 
+/* =========================================
+   ✅ AutoComplete styles
+   ========================================= */
+
+.autoList {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 10px);
+  background: rgba(136, 51, 118, 0.55);
+  border-radius: 18px;
+  padding: 12px;
+  z-index: 5;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+}
+
+.autoItem {
+  width: 100%;
+  border: none;
+  background: rgba(25, 25, 25, 0.75);
+  border-radius: 16px;
+  padding: 12px 12px;
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  color: #fff;
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.autoItem:last-child {
+  margin-bottom: 0;
+}
+
+.autoItemActive {
+  outline: 2px solid rgba(255, 255, 255, 0.28);
+  background: rgba(10, 10, 10, 0.9);
+}
+
+.autoThumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.autoText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.autoTitle {
+  font-size: 20px;
+  font-weight: 900;
+
+  /* ✅ line-clamp (표준 + webkit) */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+.autoSub {
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.9;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+}
+
+.autoRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.95;
+  white-space: nowrap;
+}
+
+.autoDate {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.autoChev {
+  font-size: 18px;
+  font-weight: 900;
+}
+
 @media (max-width: 900px) {
   .modal {
     width: calc(100% - 32px);
@@ -260,5 +340,14 @@
   }
   .label {
     font-size: 26px;
+  }
+
+  .autoItem {
+    grid-template-columns: 48px 1fr auto;
+  }
+  .autoThumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
   }
 }
