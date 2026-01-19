@@ -1,0 +1,237 @@
+.page {
+  min-height: 100vh;
+  background: #1e1e1e;
+  padding: 26px 30px 110px;
+  color: #ffffff;
+}
+
+/* ===== Segmented (My Comment / Friends) ===== */
+.segmentWrap {
+  margin: 18px auto 26px;
+  max-width: 980px;
+}
+
+.segment {
+  width: 100%;
+  height: 54px;
+  border-radius: 16px;
+  background: rgba(200, 160, 190, 0.75);
+  padding: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.segmentBtn {
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 800;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.segmentBtn.active {
+  background: #7a2f6c;
+  color: #ffffff;
+}
+
+/* ===== List ===== */
+.list {
+  max-width: 980px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* ===== Card ===== */
+.card {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  background: #2a2a2a;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.35);
+}
+
+.thumb {
+  width: 260px;
+  min-width: 260px;
+  height: 210px;
+  object-fit: cover;
+  border-radius: 18px;
+  margin: 18px 16px 18px 18px;
+}
+
+.content {
+  flex: 1;
+  padding: 22px 22px 20px 12px;
+  min-width: 0;
+}
+
+.rightBar {
+  width: 84px;
+  background: rgba(160, 120, 160, 0.55);
+}
+
+/* top row */
+.topRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.category {
+  font-size: 18px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+/* More + Delete area */
+.menuArea {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.moreBtn {
+  width: 42px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 20px;
+  font-weight: 900;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+.deleteBtn {
+  height: 34px;
+  padding: 0 22px;
+  border-radius: 18px;
+  border: none;
+  background: #ffffff;
+  color: #ff2a2a;
+  font-weight: 900;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* Title / date / preview */
+.title {
+  margin-top: 6px;
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.date {
+  margin-top: 4px;
+  font-size: 20px;
+  font-weight: 800;
+  opacity: 0.9;
+}
+
+.preview {
+  margin-top: 14px;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.35;
+  opacity: 0.92;
+
+  /* line-clamp (요구사항: 표준 속성도 같이 정의) */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+/* ===== Floating Add ===== */
+.fab {
+  position: fixed;
+  right: 56px;
+  bottom: 140px;
+  width: 150px;
+  height: 150px;
+  border-radius: 999px;
+  border: none;
+  background: #7a2f6c;
+  color: #ffffff;
+  font-size: 34px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
+}
+
+/* Footer */
+.footer {
+  margin-top: 80px;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* Empty state */
+.empty {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 28px;
+  text-align: center;
+}
+
+.emptyTitle {
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.emptySub {
+  margin-top: 8px;
+  font-size: 15px;
+  opacity: 0.75;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .page {
+    padding: 18px 16px 120px;
+  }
+
+  .thumb {
+    width: 170px;
+    min-width: 170px;
+    height: 170px;
+  }
+
+  .title {
+    font-size: 30px;
+  }
+
+  .preview {
+    font-size: 18px;
+  }
+
+  .fab {
+    right: 18px;
+    bottom: 120px;
+    width: 120px;
+    height: 120px;
+    font-size: 28px;
+  }
+
+  .rightBar {
+    width: 64px;
+  }
+}

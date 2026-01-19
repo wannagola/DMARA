@@ -21,8 +21,8 @@
 }
 
 .logo {
-  width: 200px;
-  height: 120px;
+  width: 220px;
+  height: 132px;
   object-fit: contain;
 }
 
@@ -54,11 +54,12 @@
   justify-content: flex-end;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
 }
 
 .avatar {
-  width: 18px;
-  height: 18px;
+  width: 36px;
+  height: 36px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.7);
 }
