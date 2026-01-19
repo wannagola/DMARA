@@ -1,0 +1,82 @@
+/* Custom wrapper */
+.custom-datepicker-wrapper .react-datepicker-wrapper {
+  width: 100%;
+}
+
+/* Main container */
+.react-datepicker {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 1.1rem; /* Increased base font size */
+  background-color: #232323;
+  border: 1px solid rgba(136, 51, 118, 0.55);
+  border-radius: 16px; /* Softer radius */
+  color: #fff;
+  padding: 10px; /* Add some padding */
+}
+
+/* Header */
+.react-datepicker__header {
+  background-color: #232323;
+  border-bottom: 1px solid rgba(136, 51, 118, 0.55);
+  padding: 20px 10px; /* Increased padding */
+}
+
+/* Current month */
+.react-datepicker__current-month {
+  color: #fff;
+  font-size: 1.5rem; /* Larger month text */
+  font-weight: bold;
+  padding-bottom: 15px; /* More space */
+}
+
+/* Navigation buttons */
+.react-datepicker__navigation {
+  top: 20px; /* Adjust position */
+}
+.react-datepicker__navigation-icon::before {
+  border-color: #fff;
+  border-width: 3px 3px 0 0;
+}
+
+/* Day names */
+.react-datepicker__day-name {
+  color: #fff;
+  font-weight: bold;
+  width: 2.5rem; /* Larger day name blocks */
+  line-height: 2.5rem;
+  margin: 0.2rem;
+}
+
+/* Day numbers */
+.react-datepicker__day {
+  color: #fff;
+  width: 2.5rem; /* Larger day blocks */
+  line-height: 2.5rem;
+  margin: 0.2rem;
+}
+
+.react-datepicker__day:hover {
+  background-color: rgba(136, 51, 118, 0.55);
+  border-radius: 8px; /* Rounded hover effect */
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: #883376;
+  color: #fff;
+  border-radius: 8px;
+}
+
+.react-datepicker__day--outside-month {
+  color: #666;
+}
+
+/* Popper arrow */
+.react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle::before,
+.react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle::after {
+  border-bottom-color: #232323;
+}
+.react-datepicker-popper[data-placement^="top"] .react-datepicker__triangle::before,
+.react-datepicker-popper[data-placement^="top"] .react-datepicker__triangle::after {
+  border-top-color: #232323;
+}

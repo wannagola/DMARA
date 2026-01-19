@@ -1,0 +1,264 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  z-index: 999;
+}
+
+.modal {
+  position: fixed;
+  left: 50%;
+  top: 50%; /* Adjusted top to center vertically */
+  transform: translate(-50%, -50%);
+  width: min(900px, calc(100% - 80px));
+  max-height: calc(100% - 60px); /* Increased max-height */
+  background: #232323;
+  border-radius: 34px;
+  border: 1px solid rgba(136, 51, 118, 0.55);
+  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  padding: 46px 64px 40px;
+  color: #fff;
+  display: flex; /* Added flexbox for layout */
+  flex-direction: column; /* Stack children vertically */
+}
+
+.close {
+  position: absolute;
+  right: 34px;
+  top: 26px;
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: #883376;
+  font-size: 48px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.headline {
+  text-align: center;
+  font-size: 52px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  margin: 0 0 36px;
+  flex-shrink: 0; /* Prevent headline from shrinking */
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  overflow-y: auto; /* Make form scrollable */
+  flex: 1; /* Allow form to take available vertical space */
+  padding-right: 10px; /* Add padding for scrollbar if present */
+  margin-bottom: 20px; /* Space before actions */
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  gap: 22px;
+}
+
+.rowComment {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.label {
+  font-size: 34px;
+  font-weight: 900;
+}
+
+.control {
+  position: relative;
+  border-bottom: 2px solid rgba(136, 51, 118, 0.9);
+  padding-bottom: 10px;
+}
+
+.input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 700;
+  outline: none;
+  padding: 6px 0;
+}
+
+.input[type="date"] {
+  position: relative;
+  /* color styles are removed as they are handled by the calendarIcon */
+}
+
+/* Hide the native calendar picker indicator */
+.input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.select {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 700;
+  outline: none;
+  padding: 6px 34px 6px 0;
+  appearance: none;
+}
+
+/* Styling for the custom calendar icon */
+.calendarIcon {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px; /* Larger icon size */
+  height: 40px;
+  border: 3px solid #883376; /* Purple border */
+  border-radius: 4px;
+  pointer-events: none; /* Allow clicks to pass through to the input */
+}
+
+.calendarIcon::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 3px;
+  background-color: #883376; /* Purple top bar */
+}
+
+.calendarIcon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  height: 3px;
+  background-color: #883376; /* Purple horizontal bar */
+}
+
+.commentArea {
+  position: relative;
+  margin-top: 8px;
+  display: flex; /* Use flexbox */
+  flex-direction: column; /* Stack children vertically */
+  gap: 10px; /* Space between previewBox and uploadBtn */
+}
+
+.textarea {
+  width: 100%;
+  height: 170px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 650;
+  line-height: 1.5;
+  resize: none;
+  border-bottom: 2px solid rgba(136, 51, 118, 0.9);
+  padding: 10px 0 14px;
+}
+
+.previewBox {
+  margin-top: 26px;
+  width: 100%;
+  height: 200px; /* Reduced height to give space */
+  border-radius: 18px;
+  background: #141414;
+  overflow: hidden;
+}
+
+.previewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.previewEmpty {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #121212, #1a1a1a);
+}
+
+.uploadBtn {
+  position: static; /* Remove absolute positioning */
+  /* Remove top, left, transform properties */
+  font-size: 16px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(136, 51, 118, 0.2);
+  border: 1px solid rgba(136, 51, 118, 0.55);
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  align-self: flex-start; /* Align to start in flex column */
+  width: fit-content; /* Adjust width to content */
+}
+
+.file {
+  display: none;
+}
+
+.actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.saveBtn {
+  width: 260px;
+  height: 64px;
+  border-radius: 10px;
+  border: none;
+  background: #883376;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .modal {
+    width: calc(100% - 32px);
+    height: calc(100% - 64px);
+    padding: 36px 22px 30px;
+    border-radius: 28px;
+  }
+  .headline {
+    font-size: 40px;
+  }
+  .row,
+  .rowComment {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .label {
+    font-size: 26px;
+  }
+}

@@ -20,6 +20,7 @@ export const router = createBrowserRouter([
       { path: "/whoami/edit", element: <WhoAmIEditPage /> },
       { path: "/comment", element: <CommentPage /> },
       { path: "/calendar", element: <CalendarPage /> },
+      { path: "/comment", element: <CommentPage /> },
     ],
   },
 ]);
