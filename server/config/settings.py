@@ -51,9 +51,11 @@ INSTALLED_APPS = [
     'hobbies',         # 취향 앱
     'posts',           # 기록 앱
     'users',           # 사용자 앱
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -180,3 +182,10 @@ ACCOUNT_USERNAME_REQUIRED = False    # 아이디는 필수가 아님 (이메일 
 ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_EMAIL_VERIFICATION = 'none'  # 이메일 인증 메일 발송 안 함(개발용)
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+CORS_ALLOW_CREDENTIALS = True
