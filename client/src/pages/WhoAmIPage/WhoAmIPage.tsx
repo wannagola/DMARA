@@ -85,7 +85,7 @@ export default function WhoAmIPage() {
         type="button"
         onClick={handleShare}
       >
-        공유하기
+        Share
       </button>
 
       <footer className={styles.footer}>
