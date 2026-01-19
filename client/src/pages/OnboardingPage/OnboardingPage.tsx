@@ -11,7 +11,7 @@ export default function OnboardingPage() {
 
   /** Profile */
   const [username, setUsername] = useState("Sungm1nk1"); // Mock
-  const [profileImageUrl, setProfileImageUrl] = useState(viteLogo); // Mock
+  const [profileImageUrl] = useState(viteLogo); // Mock
   const [usernameDraft, setUsernameDraft] = useState("");
 
   /** I AM */
