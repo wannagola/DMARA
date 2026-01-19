@@ -1,93 +1,67 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import html2canvas from "html2canvas";
 import WhoAmIDisplay from "./WhoAmIDisplay";
 import styles from "./WhoAmIDisplay.module.css";
-import type { CategoryItem } from "@/shared/types/category";
-import viteLogo from "/vite.svg";
+import { useProfile } from "@/shared/context/useProfile.ts";
+import viteLogo from "/vite.svg"; // Keep for placeholder
 
 export default function WhoAmIPage() {
   const pageRef = useRef<HTMLDivElement>(null);
-  
-  // --- 상태 관리 (DB에서 가져올 데이터들) ---
-  const [username, setUsername] = useState("Loading...");
-  const [profileImageUrl, setProfileImageUrl] = useState(viteLogo);
-  const [iam, setIam] = useState("");
-  const [allItems, setAllItems] = useState<CategoryItem[]>([]);
+  const [isCapturing, setIsCapturing] = useState(false);
 
-  // 1. 프로필 & 취향 데이터 불러오기
+  // --- Get data from global context ---
+  const {
+    username,
+    iam,
+    musicItems,
+    movieItems,
+    talentItems,
+    sportsItems,
+    matchesItems,
+    dramaItems,
+    showsItems,
+  } = useProfile();
+
+  // The profile image is not in the context yet, so we use a placeholder.
+  const profileImageUrl = viteLogo;
+
+  // Effect to run capture after state update
   useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem("userToken");
-      if (!token) return;
-
-      try {
-        // (1) 내 프로필 가져오기 (수정된 부분)
-        const profileRes = await fetch("http://127.0.0.1:8000/api/hobbies/profile/me/", {
-          headers: { "Authorization": `Token ${token}` },
-        });
-      
-        if (profileRes.ok) {
-          const profileData = await profileRes.json();
-        
-          // 닉네임 우선순위: 수정한 닉네임 -> 없으면 이메일 앞부분
-          const displayNick = profileData.nickname || profileData.user_email?.split("@")[0] || "User";
-        
-          setUsername(displayNick);
-          setIam(profileData.bio || "");
-          if (profileData.profile_image) {
-            setProfileImageUrl(profileData.profile_image);
-          }
-        } else {
-          // 프로필을 가져오지 못했을 경우 기본값 설정
-          setUsername("Guest");
-        }
-
-        // (2) 내가 추가한 취향 아이템들 가져오기 (기존 로직 유지)
-        const itemsRes = await fetch("http://127.0.0.1:8000/api/hobbies/items/my_items/", {
-          headers: { "Authorization": `Token ${token}` },
-        });
-        if (itemsRes.ok) {
-          const itemsData = await itemsRes.json();
-          setAllItems(itemsData);
-        }
-      } catch (err) {
-        console.error("데이터 불러오기 에러:", err);
-        setUsername("Error");
+    if (isCapturing) {
+      const elementToCapture = pageRef.current;
+      if (!elementToCapture) {
+        setIsCapturing(false);
+        return;
       }
-    };
-    fetchData();
-  }, []);
 
-  // --- 화면 표시 로직 ---
-
-  // 한 줄 소개가 비어있을 때 기본 문구
-  const iamDisplay = useMemo(() => {
-    return iam.trim().length > 0 ? iam : ``;
-  }, [iam, username]);
-
-  // 카테고리별 아이템 필터링 헬퍼 함수
-  // (백엔드에 저장된 category 문자열과 프론트 상수가 일치해야 함)
-  const getItems = (cat: string) => allItems.filter((item) => item.category === cat);
-
-  // 이미지 캡처 및 공유 기능
-  const handleShare = async () => {
-    if (!pageRef.current) return;
-    try {
-      const canvas = await html2canvas(pageRef.current, {
+      html2canvas(elementToCapture, {
         allowTaint: true,
         useCORS: true,
         backgroundColor: "#1e1e1e",
-        ignoreElements: (element) => element.classList.contains("ignore-capture"),
-      });
-      const image = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = image;
-      link.download = "dmara-share.png";
-      link.click();
-    } catch (e) {
-      console.error(e);
-      alert("Capture failed.");
+        ignoreElements: (element) =>
+          element.classList.contains("ignore-capture"),
+      })
+        .then((canvas) => {
+          const image = canvas.toDataURL("image/png");
+          const link = document.createElement("a");
+          link.href = image;
+          link.download = "dmara-share.png";
+          link.click();
+        })
+        .catch((e) => {
+          console.error(e);
+          alert("Capture failed.");
+        })
+        .finally(() => {
+          setIsCapturing(false); // Reset state after capture
+        });
     }
+  }, [isCapturing]);
+
+  // 이미지 캡처 및 공유 기능
+  const handleShare = () => {
+    if (isCapturing) return; // Prevent multiple captures
+    setIsCapturing(true); // Trigger the capture effect
   };
 
   return (
@@ -95,17 +69,17 @@ export default function WhoAmIPage() {
       <WhoAmIDisplay
         username={username}
         profileImageUrl={profileImageUrl}
-        iam={iamDisplay}
-        // DB 데이터를 카테고리별로 꽂아줍니다
-        musicItems={getItems("Music")}
-        movieItems={getItems("Movie")}
-        talentItems={getItems("Talent")}
-        sportsItems={getItems("Sports")}
-        matchesItems={getItems("Matches")}
-        dramaItems={getItems("Drama & OTT")}
-        showsItems={getItems("Shows")}
+        iam={iam}
+        musicItems={musicItems}
+        movieItems={movieItems}
+        talentItems={talentItems}
+        sportsItems={sportsItems}
+        matchesItems={matchesItems}
+        dramaItems={dramaItems}
+        showsItems={showsItems}
+        isCapturing={isCapturing} // Pass state to display component
       />
-      
+
       <button
         className={`${styles.shareButton} ignore-capture`}
         type="button"
@@ -113,7 +87,7 @@ export default function WhoAmIPage() {
       >
         공유하기
       </button>
-      
+
       <footer className={styles.footer}>
         © 2026 D_MARA. All Rights Reserved.
       </footer>

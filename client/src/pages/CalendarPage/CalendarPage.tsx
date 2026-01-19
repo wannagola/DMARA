@@ -5,13 +5,14 @@ import { enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "@/pages/CalendarPage/CalendarPage.css";
 import { isSameDay } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 // Copied from CommentPage.tsx for now
 export type CommentItem = {
   id: number;
   category: string;
   title: string;
-  date: string; // YYYY.MM.DD
+  date: string;
   contentPreview: string;
   imageUrl: string;
   likes: number;
@@ -95,8 +96,9 @@ const localizer = dateFnsLocalizer({
 
 // A simple component to render a comment item, inspired by CommentPage
 function CommentCard({ item }: { item: CommentItem }) {
+  const navigate = useNavigate(); // Hook for navigation
   return (
-    <article className="comment-card">
+    <article className="comment-card" onClick={() => navigate(`/comment/${item.id}`)}>
       <img className="comment-poster" src={item.imageUrl} alt={item.title} />
       <div className="comment-content">
         <div className="comment-top-row">
