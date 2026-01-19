@@ -25,6 +25,7 @@ urlpatterns = [
     
     # 여기서 우리가 만든 앱들을 연결합니다
     path('api/hobbies/', include('hobbies.urls')),
+    path('dj-rest-auth/', include('dj_rest_auth.urls')),
     path('api/posts/', include('posts.urls')),
     
     # 1. 일반 로그인/회원가입 (dj-rest-auth 기본 제공)
