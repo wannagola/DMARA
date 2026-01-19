@@ -1,0 +1,243 @@
+.calendar-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  background-color: #1e1e1e;
+  min-height: calc(100vh - 60px);
+}
+
+.calendar-wrapper {
+  width: 100%;
+  max-width: 800px; /* Smaller calendar width */
+  margin-bottom: 40px;
+}
+
+/* General overrides for dark theme */
+.rbc-calendar {
+  color: #ffffff;
+  height: 600px; /* Fixed height for the calendar */
+}
+
+.rbc-month-view,
+.rbc-time-view,
+.rbc-agenda-view {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 8px;
+}
+
+/* ✅ 여기만 핵심: Toolbar를 grid로 바꿔서
+   - 좌측: Today/Back/Next
+   - 우측: January 2026 (label)
+   - 가운데: (있으면) view 버튼 그룹 / 없으면 빈 공간
+*/
+.rbc-toolbar {
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+}
+
+.rbc-toolbar .rbc-toolbar-label {
+  font-size: 24px;
+  font-weight: bold;
+  grid-column: 3;
+  justify-self: end; /* ✅ 오른쪽 끝으로 */
+  text-align: right;
+}
+
+/* 첫 번째 버튼 그룹(보통 Today/Back/Next)을 왼쪽으로 고정 */
+.rbc-toolbar > .rbc-btn-group:first-child {
+  grid-column: 1;
+  justify-self: start;
+}
+
+/* 마지막 버튼 그룹(views 같은 것)이 있으면 가운데로 (없으면 그냥 영향 없음) */
+.rbc-toolbar > .rbc-btn-group:last-child {
+  grid-column: 2;
+  justify-self: center;
+}
+
+.rbc-toolbar button {
+  background-color: #3a3a3a;
+  color: #fff;
+  border: 1px solid #555;
+  transition: background-color 0.2s;
+  padding: 8px 15px;
+  border-radius: 5px;
+  margin: 0 5px;
+}
+
+.rbc-toolbar button:hover,
+.rbc-toolbar button:focus {
+  background-color: #883376;
+  border-color: #883376;
+  opacity: 1;
+}
+
+.rbc-toolbar button.rbc-active {
+  background-color: #883376;
+  border-color: #883376;
+}
+
+.rbc-btn-group {
+  display: flex;
+}
+.rbc-btn-group + .rbc-btn-group {
+  margin-left: 10px;
+}
+
+.rbc-header {
+  background-color: #333;
+  border-bottom: 1px solid #555;
+  padding: 8px 0;
+  color: #eee;
+}
+
+.rbc-day-bg {
+  border-left: 1px solid #333;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.rbc-day-bg:hover {
+  background-color: #3a3a3a;
+}
+.rbc-day-bg:first-child {
+  border-left: none;
+}
+
+.rbc-day-selected {
+  background-color: rgba(136, 51, 118, 0.4) !important;
+}
+
+.rbc-off-range-bg {
+  background-color: #222;
+}
+
+.rbc-today {
+  background-color: rgba(136, 51, 118, 0.2);
+}
+
+.rbc-event {
+  background-color: #6a285d;
+  border: 1px solid #883376;
+  color: #fff;
+  padding: 2px 5px;
+  border-radius: 4px;
+  pointer-events: none; /* Make events non-clickable */
+}
+
+/* --- Comment List Styles --- */
+.comment-list-container {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.no-comments-message {
+  text-align: center;
+  color: #aaa;
+  padding: 40px;
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  border: 1px dashed #444;
+}
+
+.comment-card {
+  display: flex;
+  align-items: stretch;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #2a2a2a;
+}
+
+.comment-poster {
+  width: 200px;
+  height: 150px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.comment-content {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.comment-category {
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.comment-title {
+  margin-top: 2px;
+  font-size: 24px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.comment-date {
+  margin-top: 4px;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.comment-preview {
+  margin-top: 12px;
+  font-size: 16px;
+  line-height: 1.4;
+  color: #ccc;
+
+  /* 기존 -webkit-line-clamp 유지 + 표준 속성 line-clamp 추가 */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2; /* ✅ 호환성 위해 표준 속성도 정의 */
+  overflow: hidden;
+}
+
+.comment-like-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(210, 170, 205, 0.3);
+}
+
+.comment-heart {
+  width: 24px;
+  height: 24px;
+  background: #d11b6b;
+  transform: rotate(45deg);
+  position: relative;
+}
+.comment-heart::before,
+.comment-heart::after {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: #d11b6b;
+  border-radius: 50%;
+}
+.comment-heart::before {
+  left: -12px;
+}
+.comment-heart::after {
+  top: -12px;
+}
+
+.comment-like-count {
+  margin-top: 15px;
+  font-size: 18px;
+  font-weight: 800;
+}
