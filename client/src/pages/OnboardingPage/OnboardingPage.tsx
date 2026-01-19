@@ -1,18 +1,23 @@
 import { useMemo, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import styles from "./OnboardingPage.module.css";
-import Modal from "@/shared/components/Modal/Modal";
 import EditCategoryModal from "@/shared/components/Modal/EditCategoryModal";
 import type { CategoryItem } from "@/shared/types/category";
 import { CATEGORIES, type CategoryKey } from "@/shared/constants/categories";
+import viteLogo from "/vite.svg";
 
 export default function OnboardingPage() {
   const pageRef = useRef<HTMLDivElement>(null);
 
+  /** Profile */
+  const [username, setUsername] = useState("Sungm1nk1"); // Mock
+  const [profileImageUrl, setProfileImageUrl] = useState(viteLogo); // Mock
+  const [usernameDraft, setUsernameDraft] = useState("");
+
   /** I AM */
   const [iam, setIam] = useState("");
-  const [isIamModalOpen, setIsIamModalOpen] = useState(false);
   const [iamDraft, setIamDraft] = useState("");
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   /** Category modals */
   const [openCategory, setOpenCategory] = useState<CategoryKey | null>(null);
@@ -46,23 +51,22 @@ export default function OnboardingPage() {
   const [dramaItems, setDramaItems] = useState<CategoryItem[]>([]);
   const [showsItems, setShowsItems] = useState<CategoryItem[]>([]);
 
-  /** Flipped items state */
-  const [flippedItemIds, setFlippedItemIds] = useState<Set<number>>(new Set());
-
   const iamDisplay = useMemo(() => {
-    return iam.trim().length > 0 ? iam : "Sungm1nk1님을 한 줄로 소개해주세요.";
+    return iam.trim().length > 0
+      ? iam
+      : "Press 'Edit' button to introduce yourself!";
   }, [iam]);
 
-  const openIamModal = () => {
+  const startEditingProfile = () => {
     setIamDraft(iam);
-    setIsIamModalOpen(true);
+    setUsernameDraft(username);
+    setIsEditingProfile(true);
   };
 
-  const closeIamModal = () => setIsIamModalOpen(false);
-
-  const saveIam = () => {
+  const saveProfile = () => {
     setIam(iamDraft.trim());
-    closeIamModal();
+    setUsername(usernameDraft.trim());
+    setIsEditingProfile(false);
   };
 
   const closeCategoryModal = () => setOpenCategory(null);
@@ -106,18 +110,6 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleItemClick = (id: number) => {
-    setFlippedItemIds((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
-  };
-
   const removeItem = (category: CategoryKey, id: number) => {
     const updater = (prev: CategoryItem[]) => prev.filter((it) => it.id !== id);
 
@@ -148,18 +140,51 @@ export default function OnboardingPage() {
 
   return (
     <div className={styles.page} ref={pageRef}>
-      {/* I AM */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>I AM</h2>
-        <div className={styles.iamBox}>
-          <span className={styles.iamText}>{iamDisplay}</span>
-          <button
-            className={styles.editButton}
-            onClick={openIamModal}
-            type="button"
-          >
-            Edit
-          </button>
+      <div className={styles.header}>
+        <button
+          className={styles.editButton}
+          onClick={startEditingProfile}
+          type="button"
+        >
+          Edit
+        </button>
+      </div>
+
+      {/* Profile Section */}
+      <section className={`${styles.section} ${styles.profileSection}`}>
+        <div className={styles.profileAvatar}>
+          <img src={profileImageUrl} alt="Profile" />
+        </div>
+        <div className={styles.profileInfo}>
+          {isEditingProfile ? (
+            <div className={styles.iamEditContainer}>
+              <input
+                className={styles.usernameInput}
+                value={usernameDraft}
+                onChange={(e) => setUsernameDraft(e.target.value)}
+                placeholder="Enter your Nickname"
+              />
+              <input
+                className={styles.iamInput}
+                value={iamDraft}
+                onChange={(e) => setIamDraft(e.target.value)}
+                placeholder="Introduce yourself"
+                autoFocus
+              />
+              <button
+                className={styles.iamSaveButton}
+                onClick={saveProfile}
+                type="button"
+              >
+                Save
+              </button>
+            </div>
+          ) : (
+            <>
+              <h1 className={styles.profileUsername}>{username}</h1>
+              <p className={styles.profileIntro}>{iamDisplay}</p>
+            </>
+          )}
         </div>
       </section>
 
@@ -181,13 +206,7 @@ export default function OnboardingPage() {
             <div className={styles.itemGrid}>
               {items.length > 0 ? (
                 items.map((item) => (
-                  <div
-                    key={item.id}
-                    className={`${styles.itemCard} ${
-                      flippedItemIds.has(item.id) ? styles.isFlipped : ""
-                    }`}
-                    onClick={() => handleItemClick(item.id)}
-                  >
+                  <div key={item.id} className={styles.itemCard}>
                     <img
                       className={styles.thumb}
                       src={item.imageUrl}
@@ -224,38 +243,6 @@ export default function OnboardingPage() {
       <footer className={styles.footer}>
         © 2026 D_MARA. All Rights Reserved.
       </footer>
-
-      {/* I AM Modal */}
-      <Modal isOpen={isIamModalOpen} title="I AM 편집" onClose={closeIamModal}>
-        <div className={styles.modalBody}>
-          <label className={styles.modalLabel}>
-            한 줄 소개
-            <input
-              className={styles.modalInput}
-              value={iamDraft}
-              onChange={(e) => setIamDraft(e.target.value)}
-              placeholder="예: 낮에는 개발자, 밤에는 가수"
-              autoFocus
-            />
-          </label>
-          <div className={styles.modalActions}>
-            <button
-              className={styles.modalGhostBtn}
-              onClick={closeIamModal}
-              type="button"
-            >
-              Cancel
-            </button>
-            <button
-              className={styles.modalPrimaryBtn}
-              onClick={saveIam}
-              type="button"
-            >
-              Save
-            </button>
-          </div>
-        </div>
-      </Modal>
 
       {/* Category Modal */}
       {openCategory && (

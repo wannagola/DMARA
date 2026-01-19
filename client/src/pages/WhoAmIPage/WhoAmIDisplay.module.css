@@ -105,13 +105,16 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  opacity: 1; /* Always visible for display-only */
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.2s ease-in-out; /* Smooth transition */
   padding: 16px;
   box-sizing: border-box;
   text-align: center;
 }
 
-/* No hover effect for display-only */
+.itemCard:hover .info {
+  opacity: 1; /* Visible on hover */
+}
 
 .itemCard .title {
   font-size: 24px;

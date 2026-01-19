@@ -3,6 +3,29 @@
   background: #1e1e1e;
   padding: 40px 80px 80px;
   color: #ffffff;
+  position: relative; /* For header positioning */
+}
+
+.header {
+  position: absolute;
+  top: 40px;
+  right: 80px;
+}
+
+.editButton {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  border-radius: 16px;
+  padding: 8px 24px;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: all 0.2s;
+}
+.editButton:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .section {
@@ -33,30 +56,96 @@
   opacity: 1;
 }
 
-/* I AM */
-.iamBox {
-  background: #2a2a2a;
-  color: #ffffff;
-  border-radius: 10px;
-  padding: 32px 20px;
+/* Profile Section */
+.profileSection {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: center; /* Center the profile content */
+  gap: 40px; /* Increased gap for better spacing */
+  margin-bottom: 60px; /* More space below profile section */
+  padding-top: 60px; /* Add padding to account for header */
 }
 
-.iamText {
+.profileAvatar {
+  width: 240px; /* Much larger avatar size */
+  height: 240px;
+  border-radius: 50%; /* Circular avatar */
+  overflow: hidden; /* Ensure image stays within circle */
+  flex-shrink: 0; /* Prevent avatar from shrinking */
+  background-color: #444; /* Placeholder background */
+}
+
+.profileAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Fill the avatar circle */
+}
+
+.profileInfo {
+  /* Removed flex-grow: 1; */
+  width: 400px; /* Give a fixed width for alignment */
+}
+
+.profileUsername {
+  font-size: 38px; /* Large username */
+  font-weight: 800;
+  margin-bottom: 8px; /* Space below username */
+}
+
+.profileIntro {
+  font-size: 20px; /* Slightly smaller intro */
+  color: rgba(255, 255, 255, 0.8);
+  min-height: 52px; /* Reserve space */
+}
+
+/* I AM Inline Edit */
+.iamEditContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.usernameInput {
+  height: 52px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.22);
+  color: #ffffff;
+  padding: 0 16px;
+  outline: none;
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
-.editButton {
+.iamInput {
+  width: 100%;
+  height: 52px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.22);
+  color: #ffffff;
+  padding: 0 16px;
+  outline: none;
+  font-size: 16px;
+}
+.iamInput:focus,
+.usernameInput:focus {
+  border-color: rgba(136, 51, 118, 0.75);
+  box-shadow: 0 0 0 4px rgba(136, 51, 118, 0.18);
+}
+
+.iamSaveButton {
+  height: 52px;
+  padding: 0 24px;
+  border-radius: 10px;
+  border: none;
   background: #883376;
   color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  padding: 16px 36px;
-  font-size: 18px;
+  font-weight: 700;
   cursor: pointer;
+  font-size: 16px;
+  flex-shrink: 0;
+  align-self: flex-end; /* Align to the right */
 }
 
 /* Item Grid */
@@ -91,16 +180,10 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  opacity: 0;
-  transition: opacity 0.2s ease-in-out;
+  opacity: 1; /* Keep visible in onboarding */
   padding: 16px;
   box-sizing: border-box;
   text-align: center;
-}
-
-.itemCard:hover .info,
-.itemCard.isFlipped .info {
-  opacity: 1;
 }
 
 .itemCard .title {
@@ -163,131 +246,12 @@
 /* Responsive */
 
 @media (max-width: 768px) {
-
   .page {
-
     padding: 24px;
-
   }
 
-}
-
-
-
-/* ===== Modal Form UI (I AM 편집에 사용) ===== */
-
-.modalBody {
-
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 18px;
-
-}
-
-
-
-.modalLabel {
-
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 10px;
-
-  font-size: 16px;
-
-  color: rgba(255, 255, 255, 0.85);
-
-}
-
-
-
-.modalInput {
-
-  height: 52px;
-
-  border-radius: 12px;
-
-  border: 1px solid rgba(255, 255, 255, 0.14);
-
-  background: rgba(0, 0, 0, 0.22);
-
-  color: #ffffff;
-
-  padding: 0 16px;
-
-  outline: none;
-
-  font-size: 16px;
-
-}
-
-
-
-.modalInput:focus {
-
-  border-color: rgba(136, 51, 118, 0.75);
-
-  box-shadow: 0 0 0 4px rgba(136, 51, 118, 0.18);
-
-}
-
-
-
-.modalActions {
-
-  display: flex;
-
-  justify-content: flex-end;
-
-  gap: 12px;
-
-}
-
-
-
-.modalGhostBtn {
-
-  height: 44px;
-
-  padding: 0 18px;
-
-  border-radius: 10px;
-
-  border: 1px solid rgba(255, 255, 255, 0.18);
-
-  background: transparent;
-
-  color: rgba(255, 255, 255, 0.92);
-
-  cursor: pointer;
-
-  font-size: 16px;
-
-}
-
-
-
-.modalPrimaryBtn {
-
-  height: 44px;
-
-  padding: 0 18px;
-
-  border-radius: 10px;
-
-  border: none;
-
-  background: #883376;
-
-  color: #ffffff;
-
-  font-weight: 700;
-
-  cursor: pointer;
-
-  font-size: 16px;
-
+  .header {
+    top: 24px;
+    right: 24px;
+  }
 }

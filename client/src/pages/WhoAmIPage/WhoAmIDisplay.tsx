@@ -29,7 +29,7 @@ export default function WhoAmIDisplay({
   showsItems,
 }: WhoAmIDisplayProps) {
   const iamDisplay = useMemo(() => {
-    return iam.trim().length > 0 ? iam : "한 줄 소개가 없습니다.";
+    return iam.trim().length > 0 ? iam : "";
   }, [iam]);
 
   const getItemsByCategory = (category: string): CategoryItem[] => {
@@ -62,7 +62,7 @@ export default function WhoAmIDisplay({
         </div>
         <div className={styles.profileInfo}>
           <h1 className={styles.profileUsername}>{username}</h1>
-          <p className={styles.profileIntro}>{iamDisplay}</p>
+          {iamDisplay && <p className={styles.profileIntro}>{iamDisplay}</p>}
         </div>
       </section>
 
