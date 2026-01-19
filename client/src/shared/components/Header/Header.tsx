@@ -19,31 +19,39 @@ export default function Header() {
   useEffect(() => {
     const fetchUserInfo = async () => {
       const token = localStorage.getItem("userToken");
-      
-      // 로그인이 안 되어 있다면 중단
       if (!token) return;
 
       try {
-        const res = await fetch("http://127.0.0.1:8000/dj-rest-auth/user/", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Token ${token}`,
-          },
-        });
+        // ★ 1순위: Profile 모델에서 내가 수정한 닉네임 가져오기
+      const profileRes = await fetch("http://127.0.0.1:8000/api/hobbies/profile/me/", {
+        headers: { "Authorization": `Token ${token}` },
+      });
 
-        if (res.ok) {
-          const data = await res.json();
-          // 가져온 이름으로 변경 (없으면 이메일 앞부분)
-          setUsername(data.username || data.email?.split("@")[0] || "User");
+        if (profileRes.ok) {
+          const profileData = await profileRes.json();
           
-          // 프로필 사진이 있다면 변경
-          if (data.profile_image) {
-            setProfileImage(data.profile_image);
+          // 사용자가 직접 수정한 닉네임이 있다면 그것을 1순위로 사용
+          if (profileData.nickname) {
+            setUsername(profileData.nickname);
+            if (profileData.profile_image) setProfileImage(profileData.profile_image);
+            return; // 닉네임을 찾았으므로 종료
           }
         }
+
+        // 2. 만약 Profile에 닉네임이 없다면 (최초 로그인 등), 기본 유저 정보를 가져옵니다.
+        const userRes = await fetch("http://127.0.0.1:8000/dj-rest-auth/user/", {
+          headers: { "Authorization": `Token ${token}` },
+        });
+
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          // 이메일 앞부분을 디폴트로 설정
+          const emailPrefix = userData.email?.split("@")[0];
+          setUsername(emailPrefix || userData.username || "User");
+        }
+
       } catch (error) {
-        console.error("헤더 정보 로딩 실패:", error);
+        console.error("헤더 정보 불러오기 실패:", error);
       }
     };
 
