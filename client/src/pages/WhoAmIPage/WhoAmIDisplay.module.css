@@ -1,0 +1,171 @@
+.page {
+  min-height: 100vh;
+  background: #1e1e1e;
+  padding: 40px 80px 80px;
+  color: #ffffff;
+}
+
+.section {
+  margin-bottom: 40px;
+}
+
+.sectionTitle {
+  margin-bottom: 14px;
+  font-size: 28px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Profile Section */
+.profileSection {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center the profile content */
+  gap: 40px; /* Increased gap for better spacing */
+  margin-bottom: 60px; /* More space below profile section */
+}
+
+.profileAvatar {
+  width: 240px; /* Much larger avatar size */
+  height: 240px;
+  border-radius: 50%; /* Circular avatar */
+  overflow: hidden; /* Ensure image stays within circle */
+  flex-shrink: 0; /* Prevent avatar from shrinking */
+  background-color: #444; /* Placeholder background */
+}
+
+.profileAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Fill the avatar circle */
+}
+
+.profileInfo {
+  /* Removed flex-grow: 1; */
+}
+
+.profileUsername {
+  font-size: 38px; /* Large username */
+  font-weight: 800;
+  margin-bottom: 8px; /* Space below username */
+}
+
+.profileIntro {
+  font-size: 20px; /* Slightly smaller intro */
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* I AM */
+.iamBox {
+  background: #2a2a2a;
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 32px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.iamText {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+/* Item Grid */
+.itemGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+.itemCard {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.itemCard .thumb {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+}
+
+.itemCard .info {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 1; /* Always visible for display-only */
+  padding: 16px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+/* No hover effect for display-only */
+
+.itemCard .title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.itemCard .subtitle {
+  font-size: 18px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Empty State for display-only */
+.emptyState {
+  border: 2px dashed #444;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  color: #a0a0a0;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #2a2a2a;
+  font-size: 20px;
+}
+
+/* Footer */
+.footer {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .page {
+    padding: 24px;
+  }
+}
+
+.shareButton {
+  margin: 60px auto 0;
+  display: block;
+  width: 180px;
+  height: 50px;
+  border-radius: 25px;
+  border: none;
+  background: #883376;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}

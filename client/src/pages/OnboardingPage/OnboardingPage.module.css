@@ -35,8 +35,8 @@
 
 /* I AM */
 .iamBox {
-  background: #ffffff;
-  color: #1e1e1e;
+  background: #2a2a2a;
+  color: #ffffff;
   border-radius: 10px;
   padding: 32px 20px;
   display: flex;
@@ -98,7 +98,8 @@
   text-align: center;
 }
 
-.itemCard:hover .info {
+.itemCard:hover .info,
+.itemCard.isFlipped .info {
   opacity: 1;
 }
 
@@ -160,8 +161,133 @@
 }
 
 /* Responsive */
+
 @media (max-width: 768px) {
+
   .page {
+
     padding: 24px;
+
   }
+
+}
+
+
+
+/* ===== Modal Form UI (I AM 편집에 사용) ===== */
+
+.modalBody {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
+
+}
+
+
+
+.modalLabel {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+  font-size: 16px;
+
+  color: rgba(255, 255, 255, 0.85);
+
+}
+
+
+
+.modalInput {
+
+  height: 52px;
+
+  border-radius: 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  background: rgba(0, 0, 0, 0.22);
+
+  color: #ffffff;
+
+  padding: 0 16px;
+
+  outline: none;
+
+  font-size: 16px;
+
+}
+
+
+
+.modalInput:focus {
+
+  border-color: rgba(136, 51, 118, 0.75);
+
+  box-shadow: 0 0 0 4px rgba(136, 51, 118, 0.18);
+
+}
+
+
+
+.modalActions {
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 12px;
+
+}
+
+
+
+.modalGhostBtn {
+
+  height: 44px;
+
+  padding: 0 18px;
+
+  border-radius: 10px;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.92);
+
+  cursor: pointer;
+
+  font-size: 16px;
+
+}
+
+
+
+.modalPrimaryBtn {
+
+  height: 44px;
+
+  padding: 0 18px;
+
+  border-radius: 10px;
+
+  border: none;
+
+  background: #883376;
+
+  color: #ffffff;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  font-size: 16px;
+
 }

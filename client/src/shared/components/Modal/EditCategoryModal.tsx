@@ -38,6 +38,14 @@ export default function EditCategoryModal({
           <div className={styles.list}>
             {items.map((it) => (
               <div key={it.id} className={styles.row}>
+                <button
+                  className={styles.removeBtn}
+                  onClick={() => onRemove(it.id)}
+                  type="button"
+                  aria-label="remove"
+                >
+                  −
+                </button>
                 <img
                   className={styles.thumb}
                   src={it.imageUrl}
@@ -48,15 +56,6 @@ export default function EditCategoryModal({
                   <div className={styles.itemTitle}>{it.title}</div>
                   <div className={styles.itemSub}>{it.subtitle}</div>
                 </div>
-
-                <button
-                  className={styles.removeBtn}
-                  onClick={() => onRemove(it.id)}
-                  type="button"
-                  aria-label="remove"
-                >
-                  −
-                </button>
               </div>
             ))}
           </div>
@@ -67,7 +66,6 @@ export default function EditCategoryModal({
             type="button"
           >
             <div className={styles.addText}>Add your {category}</div>
-            <div className={styles.plus}>+</div>
           </button>
         </div>
       </div>
