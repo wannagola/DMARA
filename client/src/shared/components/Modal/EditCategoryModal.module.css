@@ -144,10 +144,19 @@
   text-align: center;
 }
 
+.addSection {
+  margin-top: 18px;
+}
+
 .plus {
   font-size: 54px;
   font-weight: 900;
   line-height: 1;
+}
+
+.modal.searchMode {
+  height: 70vh;
+  max-height: none;
 }
 
 /* ===== Mobile ===== */
