@@ -2,55 +2,30 @@ import { useMemo, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import styles from "./OnboardingPage.module.css";
 import EditCategoryModal from "@/shared/components/Modal/EditCategoryModal";
-import type { CategoryItem } from "@/shared/types/category";
 import { CATEGORIES, type CategoryKey } from "@/shared/constants/categories";
 import viteLogo from "/vite.svg";
-import type { LibraryItem } from "@/shared/components/ItemAutocompleteSearch/ItemAutocompleteSearch.tsx";
+import { useProfile } from "@/shared/context/useProfile.ts";
 
 export default function OnboardingPage() {
   const pageRef = useRef<HTMLDivElement>(null);
 
-  /** Profile */
-  const [username, setUsername] = useState("Sungm1nk1"); // Mock
-  const [profileImageUrl] = useState(viteLogo); // Mock
-  const [usernameDraft, setUsernameDraft] = useState("");
+  // Get data and functions from the global context
+  const {
+    username,
+    iam,
+    setUsername,
+    setIam,
+    getItemsByCategory,
+    addItemToCategory,
+    removeItemFromCategory,
+  } = useProfile();
 
-  /** I AM */
-  const [iam, setIam] = useState("");
+  // Local UI state
+  const [profileImageUrl] = useState(viteLogo); // This is not in context yet
+  const [usernameDraft, setUsernameDraft] = useState("");
   const [iamDraft, setIamDraft] = useState("");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-
-  /** Category modals */
   const [openCategory, setOpenCategory] = useState<CategoryKey | null>(null);
-
-  /** 임시 mock (나중에 API/검색 붙일 자리) */
-  const [musicItems, setMusicItems] = useState<CategoryItem[]>([
-    {
-      id: 1,
-      title: "Dance All Night",
-      subtitle: "Rose - BlackPink",
-      imageUrl: new URL(`/src/assets/items/music1.jpeg`, import.meta.url).href,
-    },
-    {
-      id: 2,
-      title: "Love Never Felt So Good",
-      subtitle: "Michael Jackson",
-      imageUrl: new URL(`/src/assets/items/music2.jpeg`, import.meta.url).href,
-    },
-    {
-      id: 3,
-      title: "Versace on the Floor",
-      subtitle: "Bruno Mars",
-      imageUrl: new URL(`/src/assets/items/music3.jpeg`, import.meta.url).href,
-    },
-  ]);
-
-  const [movieItems, setMovieItems] = useState<CategoryItem[]>([]);
-  const [talentItems, setTalentItems] = useState<CategoryItem[]>([]);
-  const [sportsItems, setSportsItems] = useState<CategoryItem[]>([]);
-  const [matchesItems, setMatchesItems] = useState<CategoryItem[]>([]);
-  const [dramaItems, setDramaItems] = useState<CategoryItem[]>([]);
-  const [showsItems, setShowsItems] = useState<CategoryItem[]>([]);
 
   const iamDisplay = useMemo(() => {
     return iam.trim().length > 0
@@ -89,94 +64,6 @@ export default function OnboardingPage() {
     } catch (e) {
       console.error(e);
       alert("Something went wrong with the capture.");
-    }
-  };
-
-  const getItemsByCategory = (category: CategoryKey): CategoryItem[] => {
-    switch (category) {
-      case "Music":
-        return musicItems;
-      case "Movie":
-        return movieItems;
-      case "Talent":
-        return talentItems;
-      case "Sports":
-        return sportsItems;
-      case "Matches":
-        return matchesItems;
-      case "Drama & OTT":
-        return dramaItems;
-      case "Shows":
-        return showsItems;
-    }
-  };
-
-  const removeItem = (category: CategoryKey, id: number) => {
-    const updater = (prev: CategoryItem[]) => prev.filter((it) => it.id !== id);
-
-    switch (category) {
-      case "Music":
-        setMusicItems(updater);
-        return;
-      case "Movie":
-        setMovieItems(updater);
-        return;
-      case "Talent":
-        setTalentItems(updater);
-        return;
-      case "Sports":
-        setSportsItems(updater);
-        return;
-      case "Matches":
-        setMatchesItems(updater);
-        return;
-      case "Drama & OTT":
-        setDramaItems(updater);
-        return;
-      case "Shows":
-        setShowsItems(updater);
-        return;
-    }
-  };
-
-  const handleAddItem = (category: CategoryKey, item: LibraryItem) => {
-    const newItem: CategoryItem = {
-      id: item.id,
-      title: item.title,
-      subtitle: item.category, // Or some other detail from LibraryItem
-      imageUrl: item.imageUrl,
-    };
-
-    const updater = (prev: CategoryItem[]) => {
-      // Prevent duplicates
-      if (prev.some((existing) => existing.id === newItem.id)) {
-        return prev;
-      }
-      return [...prev, newItem];
-    };
-
-    switch (category) {
-      case "Music":
-        setMusicItems(updater);
-        return;
-      case "Movie":
-        setMovieItems(updater);
-        return;
-      case "Talent":
-        setTalentItems(updater);
-        return;
-      case "Sports":
-        setSportsItems(updater);
-        return;
-      case "Matches":
-        setMatchesItems(updater);
-        return;
-      case "Drama & OTT":
-        setDramaItems(updater);
-        return;
-      case "Shows":
-        setShowsItems(updater);
-        return;
     }
   };
 
@@ -293,8 +180,8 @@ export default function OnboardingPage() {
           category={openCategory}
           items={getItemsByCategory(openCategory)}
           onClose={closeCategoryModal}
-          onRemove={(id) => removeItem(openCategory, id)}
-          onAddItem={(item) => handleAddItem(openCategory, item)}
+          onRemove={(id) => removeItemFromCategory(openCategory, id)}
+          onAddItem={(item) => addItemToCategory(openCategory, item)}
         />
       )}
     </div>

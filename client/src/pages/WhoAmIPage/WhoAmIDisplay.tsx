@@ -14,6 +14,7 @@ type WhoAmIDisplayProps = {
   matchesItems: CategoryItem[];
   dramaItems: CategoryItem[];
   showsItems: CategoryItem[];
+  isCapturing?: boolean;
 };
 
 export default function WhoAmIDisplay({
@@ -27,6 +28,7 @@ export default function WhoAmIDisplay({
   matchesItems,
   dramaItems,
   showsItems,
+  isCapturing,
 }: WhoAmIDisplayProps) {
   const iamDisplay = useMemo(() => {
     return iam.trim().length > 0 ? iam : "";
@@ -74,7 +76,11 @@ export default function WhoAmIDisplay({
             <div className={styles.itemGrid}>
               {items.length > 0 ? (
                 items.map((item) => (
-                  <div key={item.id} className={styles.itemCard}>
+                  <div
+                    key={item.id}
+                    className={styles.itemCard}
+                    data-is-capturing={isCapturing}
+                  >
                     <img
                       className={styles.thumb}
                       src={item.imageUrl}

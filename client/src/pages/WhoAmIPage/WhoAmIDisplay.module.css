@@ -112,8 +112,9 @@
   text-align: center;
 }
 
-.itemCard:hover .info {
-  opacity: 1; /* Visible on hover */
+.itemCard:hover .info,
+.itemCard[data-is-capturing="true"] .info {
+  opacity: 1; /* Visible on hover or during capture */
 }
 
 .itemCard .title {

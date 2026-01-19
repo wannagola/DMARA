@@ -1,0 +1,143 @@
+.page {
+  padding: 40px;
+  background-color: #1e1e1e;
+  min-height: 100vh;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+}
+
+.article {
+  width: 100%;
+  max-width: 900px;
+  background-color: #2a2a2a;
+  border-radius: 24px;
+  padding: 40px 60px;
+  border: 1px solid #444;
+  position: relative; /* For back button positioning */
+}
+
+.backButton {
+  position: absolute;
+  top: 40px;
+  left: 60px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  width: 50px; /* Wider button */
+  height: 50px; /* Taller button */
+  border-radius: 8px; /* Rounded square */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.category {
+  font-size: 18px;
+  font-weight: 600;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: 900;
+  margin: 0;
+}
+
+.meta {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  font-size: 18px;
+}
+
+.date {
+  color: #ccc;
+}
+
+.likeBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.heartButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.heart {
+  width: 28px;
+  height: 28px;
+  stroke: #d11b6b;
+  stroke-width: 1.5;
+  fill: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.heart.liked {
+  fill: #d11b6b;
+  stroke: #d11b6b;
+  transform: scale(1.1);
+}
+
+.likeCount {
+  font-weight: 700;
+}
+
+.poster {
+  width: 100%;
+  max-height: 500px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin-bottom: 40px;
+}
+
+.contentBody {
+  font-size: 20px;
+  line-height: 1.7;
+  white-space: pre-wrap; /* Preserve line breaks from the string */
+  color: #e0e0e0;
+}
+
+.loading {
+  padding: 60px;
+  text-align: center;
+  font-size: 24px;
+  color: #888;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 20px;
+  }
+  .article {
+    padding: 30px 24px;
+  }
+  .title {
+    font-size: 36px;
+  }
+  .contentBody {
+    font-size: 18px;
+  }
+}
