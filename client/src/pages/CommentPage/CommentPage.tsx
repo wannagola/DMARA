@@ -1,358 +1,352 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import styles from "./CommentPage.module.css";
-import Modal from "@/shared/components/Modal/Modal";
+import AddCommentModal, {
+  type NewCommentPayload,
+} from "@/pages/CommentPage/components/AddCommentModal";
 
-type CommentItem = {
+export type CommentItem = {
   id: number;
   category: string;
   title: string;
   date: string; // YYYY.MM.DD
-  preview: string;
+  contentPreview: string;
   imageUrl: string;
+  likes: number;
 };
 
-const formatDateToDots = (value: string) => {
-  // "2026-01-17" -> "2026.01.17"
-  if (!value) return "";
-  const [y, m, d] = value.split("-");
-  if (!y || !m || !d) return value;
-  return `${y}.${m}.${d}`;
-};
+const initialItems: CommentItem[] = [
+  {
+    id: 1,
+    category: "Exhibitions & Shows",
+    title: "Wicked",
+    date: "2026.01.16",
+    contentPreview:
+      "오늘 뮤지컬 Wicked를 보고 왔다. 생각보다 내용이 무거워서 조금 놀랐다. 엘파바가 단순히 나쁜 ...",
+    imageUrl: "/src/assets/items/wicked.png",
+    likes: 57,
+  },
+  {
+    id: 2,
+    category: "Exhibitions & Shows",
+    title: "DEADLINE : WORLD TOUR...",
+    date: "2025.07.05",
+    contentPreview:
+      "오늘은 바로 기다리고 기다리던 콘서트를 다녀온 날이다! 아침 일찍부터 준비를 하고 셔틀버스를...",
+    imageUrl: "/src/assets/items/deadline.png",
+    likes: 33,
+  },
+];
+
+type TabKey = "MY" | "FRIENDS";
 
 export default function CommentPage() {
-  const [activeTab, setActiveTab] = useState<"my" | "friends">("my");
-  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
-  // ✅ Add Modal state
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [draftCategory, setDraftCategory] = useState("Exhibitions & Shows");
-  const [draftTitle, setDraftTitle] = useState("");
-  const [draftDate, setDraftDate] = useState(""); // input: yyyy-mm-dd
-  const [draftContent, setDraftContent] = useState("");
-  const [draftImageUrl, setDraftImageUrl] = useState("");
-  const [draftImageFileUrl, setDraftImageFileUrl] = useState<string | null>(
-    null,
-  );
+  const [tab, setTab] = useState<TabKey>("MY");
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [items, setItems] = useState<CommentItem[]>(initialItems);
 
-  // 목업 데이터 (나중에 API로 교체)
-  const [items, setItems] = useState<CommentItem[]>([
-    {
-      id: 1,
-      category: "Exhibitions & Shows",
-      title: "Wicked",
-      date: "2026.01.16",
-      preview:
-        "오늘 뮤지컬 Wicked를 보고 왔다. 생각보다 내용이 무거워서 조금 놀랐다. 엘파바가 단순히 나쁜 ...",
-      imageUrl: "/src/assets/items/wicked.png",
-    },
-    {
-      id: 2,
-      category: "Exhibitions & Shows",
-      title: "DEADLINE : WORLD TOUR...",
-      date: "2025.07.05",
-      preview:
-        "오늘은 바로 기다리고 기다리던 콘서트를 다녀온 날이다! 아침 일찍부터 준비를 하고 셔틀버스를...",
-      imageUrl: "/src/assets/items/deadline.png",
-    },
-  ]);
+  const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
 
-  const visibleItems = useMemo(() => {
-    if (activeTab === "friends") return [];
-    return items;
-  }, [activeTab, items]);
 
-  // 바깥 클릭 시 "DELETE" 메뉴 닫기
-  useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      if (!openMenuId) return;
-      const target = e.target as HTMLElement;
-      if (target.closest(`[data-menu-root="true"]`)) return;
-      setOpenMenuId(null);
+
+  // Add modal state
+
+    const [isAddOpen, setIsAddOpen] = useState(false);
+
+    const [category, setCategory] = useState("Exhibitions & Shows");
+
+    const [title, setTitle] = useState("");
+
+    const [date, setDate] = useState<Date | null>(null);
+
+    const [comment, setComment] = useState("");
+
+    const [file, setFile] = useState<File | null>(null);
+
+  
+
+    const visibleItems = useMemo(() => {
+
+      return items;
+
+    }, [items]);
+
+  
+
+    const toggleMenu = (id: number) => {
+
+      setMenuOpenId((prev) => (prev === id ? null : id));
+
     };
 
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [openMenuId]);
+  
 
-  const toggleMenu = (id: number) => {
-    setOpenMenuId((prev) => (prev === id ? null : id));
-  };
+    const deleteItem = (id: number) => {
 
-  const deleteItem = (id: number) => {
-    setItems((prev) => prev.filter((it) => it.id !== id));
-    setOpenMenuId(null);
-  };
+      setItems((prev) => prev.filter((it) => it.id !== id));
 
-  // ===== Add Modal handlers =====
-  const openAddModal = () => {
-    setDraftCategory("Exhibitions & Shows");
-    setDraftTitle("");
-    setDraftDate("");
-    setDraftContent("");
-    setDraftImageUrl("");
+      setMenuOpenId(null);
 
-    // 이전 파일 미리보기 URL 정리
-    if (draftImageFileUrl) URL.revokeObjectURL(draftImageFileUrl);
-    setDraftImageFileUrl(null);
-
-    setIsAddOpen(true);
-  };
-
-  const closeAddModal = () => {
-    setIsAddOpen(false);
-  };
-
-  const onPickImage = () => {
-    fileInputRef.current?.click();
-  };
-
-  const onImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // 기존 objectURL 정리
-    if (draftImageFileUrl) URL.revokeObjectURL(draftImageFileUrl);
-
-    const url = URL.createObjectURL(file);
-    setDraftImageFileUrl(url);
-
-    // URL 입력보다 파일이 우선하도록 URL 입력은 비워둠(원하면 유지해도 됨)
-    setDraftImageUrl("");
-  };
-
-  const canSave =
-    draftCategory.trim().length > 0 &&
-    draftTitle.trim().length > 0 &&
-    draftDate.trim().length > 0 &&
-    draftContent.trim().length > 0 &&
-    (draftImageFileUrl || draftImageUrl.trim().length > 0);
-
-  const saveNewComment = () => {
-    if (!canSave) return;
-
-    const imageUrlFinal = draftImageFileUrl
-      ? draftImageFileUrl
-      : draftImageUrl.trim();
-
-    const newItem: CommentItem = {
-      id: Date.now(),
-      category: draftCategory.trim(),
-      title: draftTitle.trim(),
-      date: formatDateToDots(draftDate.trim()),
-      preview: draftContent.trim(),
-      imageUrl: imageUrlFinal,
     };
 
-    // 최신이 위로 오게
-    setItems((prev) => [newItem, ...prev]);
-    setIsAddOpen(false);
-  };
+  
 
-  return (
-    <div className={styles.page}>
-      {/* 상단 토글 바 (My Comment / Friends) */}
-      <div className={styles.segmentWrap}>
-        <div className={styles.segment}>
+    const openAdd = () => {
+
+      setMenuOpenId(null);
+
+      // Reset form state
+
+      setCategory("Exhibitions & Shows");
+
+      setTitle("");
+
+      setDate(null);
+
+      setComment("");
+
+      setFile(null);
+
+      setIsAddOpen(true);
+
+    };
+
+  
+
+    const closeAdd = () => setIsAddOpen(false);
+
+  
+
+    const handleAddSubmit = (payload: NewCommentPayload) => {
+
+      const nextId = (items[0]?.id ?? 0) + 1;
+
+  
+
+      const yyyy = payload.date.getFullYear();
+
+      const mm = String(payload.date.getMonth() + 1).padStart(2, "0");
+
+      const dd = String(payload.date.getDate()).padStart(2, "0");
+
+  
+
+      const newItem: CommentItem = {
+
+        id: nextId,
+
+        category: payload.category,
+
+        title: payload.title,
+
+        date: `${yyyy}.${mm}.${dd}`,
+
+        contentPreview: payload.comment,
+
+        imageUrl: payload.imagePreviewUrl ?? "/src/assets/items/placeholder.png",
+
+        likes: 0,
+
+      };
+
+  
+
+      setItems((prev) => [newItem, ...prev]);
+
+      closeAdd();
+
+    };
+
+  
+
+    return (
+
+      <div className={styles.page}>
+
+        {/* sub tab bar */}
+
+        <div className={styles.subTabWrap}>
+
           <button
+
             type="button"
-            className={`${styles.segmentBtn} ${
-              activeTab === "my" ? styles.active : ""
-            }`}
-            onClick={() => setActiveTab("my")}
+
+            className={`${styles.subTab} ${tab === "MY" ? styles.active : ""}`}
+
+            onClick={() => setTab("MY")}
+
           >
+
             My Comment
+
           </button>
 
           <button
+
             type="button"
-            className={`${styles.segmentBtn} ${
-              activeTab === "friends" ? styles.active : ""
+
+            className={`${styles.subTab} ${
+
+              tab === "FRIENDS" ? styles.active : ""
+
             }`}
-            onClick={() => setActiveTab("friends")}
+
+            onClick={() => setTab("FRIENDS")}
+
           >
+
             Friends
+
           </button>
+
         </div>
-      </div>
 
-      {/* 리스트 */}
-      <div className={styles.list}>
-        {visibleItems.map((it) => {
-          const isMenuOpen = openMenuId === it.id;
+  
 
-          return (
-            <div key={it.id} className={styles.card} data-menu-root="true">
-              {/* 이미지 */}
-              <img className={styles.thumb} src={it.imageUrl} alt={it.title} />
+        <div className={styles.list}>
 
-              {/* 내용 */}
+          {visibleItems.map((it) => (
+
+            <article key={it.id} className={styles.card}>
+
+              <img className={styles.poster} src={it.imageUrl} alt={it.title} />
+
+  
+
               <div className={styles.content}>
-                <div className={styles.topRow}>
-                  <div className={styles.category}>{it.category}</div>
 
-                  <div className={styles.menuArea}>
-                    {isMenuOpen && (
-                      <button
-                        type="button"
-                        className={styles.deleteBtn}
-                        onClick={() => deleteItem(it.id)}
-                      >
-                        DELETE
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      className={styles.moreBtn}
-                      onClick={() => toggleMenu(it.id)}
-                      aria-label="more"
-                    >
-                      •••
-                    </button>
+                <div className={styles.topRow}>
+
+                  <div className={styles.meta}>
+
+                    <div className={styles.category}>{it.category}</div>
+
+                    <div className={styles.title}>{it.title}</div>
+
+                    <div className={styles.date}>{it.date}</div>
+
                   </div>
+
+  
+
+                  <div className={styles.rightTop}>
+
+                    <button
+
+                      type="button"
+
+                      className={styles.moreBtn}
+
+                      onClick={() => toggleMenu(it.id)}
+
+                      aria-label="more"
+
+                    >
+
+                      •••
+
+                    </button>
+
+  
+
+                    {menuOpenId === it.id && (
+
+                      <button
+
+                        type="button"
+
+                        className={styles.deleteBtn}
+
+                        onClick={() => deleteItem(it.id)}
+
+                      >
+
+                        DELETE
+
+                      </button>
+
+                    )}
+
+                  </div>
+
                 </div>
 
-                <div className={styles.title}>{it.title}</div>
-                <div className={styles.date}>{it.date}</div>
+  
 
-                <p className={styles.preview}>{it.preview}</p>
+                <p className={styles.preview}>{it.contentPreview}</p>
+
               </div>
 
-              {/* 카드 오른쪽 “바” */}
-              <div className={styles.rightBar} />
-            </div>
-          );
-        })}
+  
 
-        {activeTab === "friends" && (
-          <div className={styles.empty}>
-            <div className={styles.emptyTitle}>Friends</div>
-            <div className={styles.emptySub}>아직 표시할 코멘트가 없어요.</div>
-          </div>
-        )}
+              <div className={styles.likeBox}>
+
+                <div className={styles.heart} aria-hidden="true" />
+
+                <div className={styles.likeCount}>{it.likes}</div>
+
+              </div>
+
+            </article>
+
+          ))}
+
+        </div>
+
+  
+
+        {/* floating add */}
+
+        <button type="button" className={styles.fab} onClick={openAdd}>
+
+          Add
+
+        </button>
+
+  
+
+        <footer className={styles.footer}>
+
+          © 2026 D_MARA. All Rights Reserved.
+
+        </footer>
+
+  
+
+        {/* Add modal (레퍼런스 스타일) */}
+
+        <AddCommentModal
+
+          isOpen={isAddOpen}
+
+          onClose={closeAdd}
+
+          onSubmit={handleAddSubmit}
+
+          category={category}
+
+          setCategory={setCategory}
+
+          title={title}
+
+          setTitle={setTitle}
+
+          date={date}
+
+          setDate={setDate}
+
+          comment={comment}
+
+          setComment={setComment}
+
+          file={file}
+
+          setFile={setFile}
+
+        />
+
       </div>
 
-      {/* Add 버튼 */}
-      <button type="button" className={styles.fab} onClick={openAddModal}>
-        Add
-      </button>
+    );
 
-      <footer className={styles.footer}>
-        © 2026 D_MARA. All Rights Reserved.
-      </footer>
-
-      {/* ✅ Add Modal */}
-      <Modal isOpen={isAddOpen} title="코멘트 추가" onClose={closeAddModal}>
-        <div className={styles.addBody}>
-          <label className={styles.addLabel}>
-            Category
-            <input
-              className={styles.addInput}
-              value={draftCategory}
-              onChange={(e) => setDraftCategory(e.target.value)}
-              placeholder="예: Exhibitions & Shows"
-            />
-          </label>
-
-          <label className={styles.addLabel}>
-            Title
-            <input
-              className={styles.addInput}
-              value={draftTitle}
-              onChange={(e) => setDraftTitle(e.target.value)}
-              placeholder="예: Wicked"
-              autoFocus
-            />
-          </label>
-
-          <label className={styles.addLabel}>
-            Date
-            <input
-              className={styles.addInput}
-              type="date"
-              value={draftDate}
-              onChange={(e) => setDraftDate(e.target.value)}
-            />
-          </label>
-
-          <label className={styles.addLabel}>
-            Comment
-            <textarea
-              className={styles.addTextarea}
-              value={draftContent}
-              onChange={(e) => setDraftContent(e.target.value)}
-              placeholder="코멘트를 입력하세요"
-            />
-          </label>
-
-          <div className={styles.addRow}>
-            <div className={styles.addCol}>
-              <div className={styles.addLabelText}>Image</div>
-
-              <div className={styles.imageActions}>
-                <button
-                  type="button"
-                  className={styles.pickBtn}
-                  onClick={onPickImage}
-                >
-                  Upload
-                </button>
-
-                <input
-                  ref={fileInputRef}
-                  className={styles.hiddenFile}
-                  type="file"
-                  accept="image/*"
-                  onChange={onImageFileChange}
-                />
-              </div>
-
-              <div className={styles.orLine}>or</div>
-
-              <input
-                className={styles.addInput}
-                value={draftImageUrl}
-                onChange={(e) => setDraftImageUrl(e.target.value)}
-                placeholder="이미지 URL 붙여넣기"
-              />
-            </div>
-
-            <div className={styles.previewBox}>
-              <div className={styles.previewTitle}>Preview</div>
-              <div className={styles.previewFrame}>
-                {draftImageFileUrl || draftImageUrl ? (
-                  <img
-                    className={styles.previewImg}
-                    src={draftImageFileUrl || draftImageUrl}
-                    alt="preview"
-                  />
-                ) : (
-                  <div className={styles.previewEmpty}>No image</div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.addActions}>
-            <button
-              type="button"
-              className={styles.cancelBtn}
-              onClick={closeAddModal}
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              className={styles.saveBtn}
-              onClick={saveNewComment}
-              disabled={!canSave}
-            >
-              Save
-            </button>
-          </div>
-        </div>
-      </Modal>
-    </div>
-  );
-}
+  }

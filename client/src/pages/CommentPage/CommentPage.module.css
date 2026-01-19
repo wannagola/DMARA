@@ -1,123 +1,162 @@
 .page {
   min-height: 100vh;
   background: #1e1e1e;
-  padding: 26px 30px 110px;
-  color: #ffffff;
+  padding: 28px 28px 80px;
+  color: #fff;
 }
 
-/* ===== Segmented (My Comment / Friends) ===== */
-.segmentWrap {
-  margin: 18px auto 26px;
-  max-width: 980px;
-}
-
-.segment {
-  width: 100%;
-  height: 54px;
-  border-radius: 16px;
-  background: rgba(200, 160, 190, 0.75);
-  padding: 6px;
+/* 상단 sub tab bar */
+.subTabWrap {
+  width: min(1120px, 100%);
+  margin: 20px auto 26px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 14px;
+  overflow: hidden;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  overflow: hidden;
 }
 
-.segmentBtn {
+.subTab {
   border: none;
-  border-radius: 12px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 800;
+  color: rgba(255, 255, 255, 0.92);
   font-size: 22px;
+  font-weight: 800;
   cursor: pointer;
 }
 
-.segmentBtn.active {
-  background: #7a2f6c;
-  color: #ffffff;
+.active {
+  background: #883376;
 }
 
-/* ===== List ===== */
+/* 리스트 */
 .list {
-  max-width: 980px;
+  width: min(1120px, 100%);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 18px;
 }
 
-/* ===== Card ===== */
+/* 카드 */
 .card {
   position: relative;
   display: flex;
   align-items: stretch;
-  background: #2a2a2a;
-  border-radius: 22px;
+  border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.35);
+  background: #2a2a2a;
 }
 
-.thumb {
-  width: 260px;
-  min-width: 260px;
-  height: 210px;
+/* 오른쪽에 살짝 보이는 연보라 영역 */
+.card::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 92px;
+  height: 100%;
+  background: rgba(210, 170, 205, 0.45);
+  pointer-events: none;
+}
+
+/* 이미지 */
+.poster {
+  width: 300px;
+  height: 220px;
   object-fit: cover;
-  border-radius: 18px;
-  margin: 18px 16px 18px 18px;
+  border-radius: 24px;
+  margin: 18px 18px 18px 18px;
+  flex: 0 0 auto;
 }
 
+/* 텍스트 영역 */
 .content {
+  position: relative;
+  z-index: 1;
   flex: 1;
-  padding: 22px 22px 20px 12px;
-  min-width: 0;
+  padding: 26px 24px;
+  padding-right: 110px; /* 오른쪽 좋아요 영역 여백 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.rightBar {
-  width: 84px;
-  background: rgba(160, 120, 160, 0.55);
-}
-
-/* top row */
 .topRow {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 12px;
 }
 
 .category {
   font-size: 18px;
   font-weight: 700;
-  opacity: 0.9;
+  opacity: 0.92;
 }
 
-/* More + Delete area */
-.menuArea {
+.title {
+  margin-top: 4px;
+  font-size: 44px;
+  font-weight: 900;
+  line-height: 1.05;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.date {
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 800;
+  opacity: 0.95;
+}
+
+.preview {
+  margin-top: 18px;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.4;
+
+  /* 멀티라인 줄임표 (표준 속성도 같이 정의) */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+
+  overflow: hidden;
+}
+
+/* 우상단 ... / DELETE */
+.rightTop {
   position: relative;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  flex: 0 0 auto;
 }
 
 .moreBtn {
-  width: 42px;
-  height: 30px;
   border: none;
   background: transparent;
   color: rgba(255, 255, 255, 0.85);
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 900;
   cursor: pointer;
-  line-height: 1;
-  padding: 0;
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+.moreBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .deleteBtn {
-  height: 34px;
-  padding: 0 22px;
-  border-radius: 18px;
-  border: none;
+  position: absolute;
+  top: 44px;
+  right: 0;
+  width: 150px;
+  height: 44px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
   background: #ffffff;
   color: #ff2a2a;
   font-weight: 900;
@@ -125,113 +164,114 @@
   cursor: pointer;
 }
 
-/* Title / date / preview */
-.title {
-  margin-top: 6px;
-  font-size: 44px;
-  font-weight: 900;
-  letter-spacing: 0.2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* 좋아요 영역 */
+.likeBox {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
 }
 
-.date {
-  margin-top: 4px;
-  font-size: 20px;
-  font-weight: 800;
-  opacity: 0.9;
+.heart {
+  width: 34px;
+  height: 34px;
+  background: #d11b6b;
+  transform: rotate(45deg);
+  border-radius: 8px;
+  position: relative;
+}
+.heart::before,
+.heart::after {
+  content: "";
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  background: #d11b6b;
+  border-radius: 50%;
+}
+.heart::before {
+  left: -17px;
+  top: 0;
+}
+.heart::after {
+  top: -17px;
+  left: 0;
 }
 
-.preview {
-  margin-top: 14px;
+.likeCount {
   font-size: 22px;
-  font-weight: 800;
-  line-height: 1.35;
-  opacity: 0.92;
-
-  /* line-clamp (요구사항: 표준 속성도 같이 정의) */
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  overflow: hidden;
+  font-weight: 900;
 }
 
-/* ===== Floating Add ===== */
+/* Floating Add 버튼 */
 .fab {
   position: fixed;
-  right: 56px;
-  bottom: 140px;
-  width: 150px;
-  height: 150px;
+  right: 36px;
+  bottom: 46px;
+  width: 140px;
+  height: 140px;
   border-radius: 999px;
   border: none;
-  background: #7a2f6c;
-  color: #ffffff;
+  background: #883376;
+  color: #fff;
   font-size: 34px;
   font-weight: 900;
   cursor: pointer;
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
 }
 
-/* Footer */
 .footer {
-  margin-top: 80px;
+  margin-top: 34px;
   text-align: center;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.6);
 }
 
-/* Empty state */
-.empty {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  padding: 28px;
-  text-align: center;
-}
-
-.emptyTitle {
-  font-size: 24px;
-  font-weight: 900;
-}
-
-.emptySub {
-  margin-top: 8px;
-  font-size: 15px;
-  opacity: 0.75;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-  .page {
-    padding: 18px 16px 120px;
+@media (max-width: 980px) {
+  .poster {
+    width: 240px;
+    height: 200px;
   }
-
-  .thumb {
-    width: 170px;
-    min-width: 170px;
-    height: 170px;
-  }
-
   .title {
-    font-size: 30px;
+    font-size: 36px;
   }
+}
 
-  .preview {
-    font-size: 18px;
+@media (max-width: 768px) {
+  .page {
+    padding: 18px 16px 80px;
   }
-
+  .card {
+    flex-direction: column;
+  }
+  .poster {
+    width: calc(100% - 36px);
+    height: 240px;
+    margin: 18px;
+  }
+  .content {
+    padding-right: 24px;
+  }
+  .card::after {
+    display: none;
+  }
+  .likeBox {
+    position: static;
+    transform: none;
+    margin: 0 0 18px auto;
+    padding-right: 18px;
+  }
   .fab {
     right: 18px;
-    bottom: 120px;
+    bottom: 24px;
     width: 120px;
     height: 120px;
-    font-size: 28px;
-  }
-
-  .rightBar {
-    width: 64px;
+    font-size: 30px;
   }
 }
