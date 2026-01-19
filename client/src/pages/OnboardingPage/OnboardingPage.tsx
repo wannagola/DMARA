@@ -5,6 +5,7 @@ import EditCategoryModal from "@/shared/components/Modal/EditCategoryModal";
 import type { CategoryItem } from "@/shared/types/category";
 import { CATEGORIES, type CategoryKey } from "@/shared/constants/categories";
 import viteLogo from "/vite.svg";
+import type { LibraryItem } from "@/shared/components/ItemAutocompleteSearch/ItemAutocompleteSearch.tsx";
 
 export default function OnboardingPage() {
   const pageRef = useRef<HTMLDivElement>(null);
@@ -112,6 +113,47 @@ export default function OnboardingPage() {
 
   const removeItem = (category: CategoryKey, id: number) => {
     const updater = (prev: CategoryItem[]) => prev.filter((it) => it.id !== id);
+
+    switch (category) {
+      case "Music":
+        setMusicItems(updater);
+        return;
+      case "Movie":
+        setMovieItems(updater);
+        return;
+      case "Talent":
+        setTalentItems(updater);
+        return;
+      case "Sports":
+        setSportsItems(updater);
+        return;
+      case "Matches":
+        setMatchesItems(updater);
+        return;
+      case "Drama & OTT":
+        setDramaItems(updater);
+        return;
+      case "Shows":
+        setShowsItems(updater);
+        return;
+    }
+  };
+
+  const handleAddItem = (category: CategoryKey, item: LibraryItem) => {
+    const newItem: CategoryItem = {
+      id: item.id,
+      title: item.title,
+      subtitle: item.category, // Or some other detail from LibraryItem
+      imageUrl: item.imageUrl,
+    };
+
+    const updater = (prev: CategoryItem[]) => {
+      // Prevent duplicates
+      if (prev.some((existing) => existing.id === newItem.id)) {
+        return prev;
+      }
+      return [...prev, newItem];
+    };
 
     switch (category) {
       case "Music":
@@ -252,9 +294,7 @@ export default function OnboardingPage() {
           items={getItemsByCategory(openCategory)}
           onClose={closeCategoryModal}
           onRemove={(id) => removeItem(openCategory, id)}
-          onAddClick={() => {
-            alert(`Add flow for ${openCategory}`);
-          }}
+          onAddItem={(item) => handleAddItem(openCategory, item)}
         />
       )}
     </div>

@@ -1,0 +1,87 @@
+.container {
+  position: relative;
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+  border: 1px solid #883376;
+  background: rgba(0, 0, 0, 0.2);
+  color: #fff;
+  font-size: 24px; /* Larger font size */
+  font-weight: 500;
+  outline: none;
+  padding: 18px 20px; /* Larger padding */
+  border-radius: 12px; /* Larger border-radius */
+  height: 64px; /* Explicit height */
+}
+
+.input:focus {
+  box-shadow: 0 0 0 4px rgba(136, 51, 118, 0.4); /* Larger shadow */
+}
+
+.autoList {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 12px); /* More space below input */
+  background: #3a3a3a;
+  border-radius: 16px; /* Larger border-radius */
+  padding: 12px; /* Larger padding */
+  z-index: 10;
+  border: 1px solid #555;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4); /* Larger shadow */
+  max-height: 800px; /* Greatly increased max-height */
+  overflow-y: auto;
+}
+
+.autoItem {
+  width: 100%;
+  border: none;
+  background: transparent;
+  border-radius: 10px; /* Larger border-radius */
+  padding: 12px; /* Larger padding */
+  display: grid;
+  grid-template-columns: 60px 1fr; /* Larger thumb area */
+  align-items: center;
+  gap: 16px; /* Larger gap */
+  cursor: pointer;
+  color: #fff;
+  text-align: left;
+  min-height: 80px; /* Minimum height for better spacing */
+}
+
+.autoItem:not(:last-child) {
+  margin-bottom: 6px; /* More space between items */
+}
+
+.autoItem:hover,
+.autoItemActive {
+  background: #883376;
+}
+
+.autoThumb {
+  width: 60px; /* Larger thumb */
+  height: 60px; /* Larger thumb */
+  border-radius: 8px; /* Larger border-radius */
+  object-fit: cover;
+}
+
+.autoText {
+  min-width: 0;
+}
+
+.autoTitle {
+  font-size: 20px; /* Larger font size */
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.noResults {
+  padding: 30px; /* Larger padding */
+  text-align: center;
+  color: #aaa;
+  font-size: 18px; /* Larger font size */
+}
