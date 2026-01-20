@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-u-+jt%e5@6)-*qx=2a7iya&%#j#kileniq=i3q2&hrbk6sjzr2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -183,9 +183,15 @@ ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_EMAIL_VERIFICATION = 'none'  # 이메일 인증 메일 발송 안 함(개발용)
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
-
+# 2. CORS: 누구나 내 데이터를 가져갈 수 있게 허용 (해커톤용)
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
+# 3. CSRF: 로그인할 때 믿을 수 있는 사이트 목록 (★ 제일 중요)
+# http:// 부터 포트번호까지 정확히 적어야 합니다.
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',               # 로컬 프론트엔드
+    'http://127.0.0.1:5173',               # 로컬 프론트엔드 (IP)
+    'http://54.180.118.183.nip.io:5173',   # 서버 프론트엔드 (nip.io)
+    'http://54.180.118.183:5173',          # (혹시 몰라 IP도 추가)
+]

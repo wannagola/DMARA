@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./ItemAutocompleteSearch.module.css";
+import BACKEND_URL from "@/config";
 
 export type LibraryItem = {
   id?: number; 
@@ -56,8 +57,8 @@ export default function ItemAutocompleteSearch({
         // 1. Talent 로직
         if (category === "Talent") {
           const [actorRes, idolRes] = await Promise.all([
-            fetch(`http://127.0.0.1:8000/api/hobbies/search/?category=ACTOR&query=${encodeURIComponent(query)}`),
-            fetch(`http://127.0.0.1:8000/api/hobbies/search/?category=IDOL&query=${encodeURIComponent(query)}`)
+            fetch(`${BACKEND_URL}/api/hobbies/search/?category=ACTOR&query=${encodeURIComponent(query)}`),
+            fetch(`${BACKEND_URL}/api/hobbies/search/?category=IDOL&query=${encodeURIComponent(query)}`)
           ]);
 
           const actorData = await actorRes.json();
@@ -72,7 +73,7 @@ export default function ItemAutocompleteSearch({
           // 나머지 카테고리
           const backendCategory = SEARCH_CATEGORY_MAP[category] || "ETC";
           const res = await fetch(
-            `http://127.0.0.1:8000/api/hobbies/search/?category=${backendCategory}&query=${encodeURIComponent(query)}`
+            `${BACKEND_URL}/api/hobbies/search/?category=${backendCategory}&query=${encodeURIComponent(query)}`
           );
           const data = await res.json();
           rawResults = data.results || [];
