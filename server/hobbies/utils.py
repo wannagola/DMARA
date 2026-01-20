@@ -141,7 +141,7 @@ def search_spotify(query, category):
             "media": "music",
             "entity": "song",
             "country": "KR",
-            "limit": 10
+            "limit": 20
         }
         results = []
         try:
