@@ -57,7 +57,8 @@
   top: 0;
   width: 92px;
   height: 100%;
-  background: rgba(210, 170, 205, 0.45);
+  background: var(--primary-color-a45); /* Base theme color with opacity */
+  filter: brightness(1.5); /* Make it brighter */
   pointer-events: none;
 }
 
