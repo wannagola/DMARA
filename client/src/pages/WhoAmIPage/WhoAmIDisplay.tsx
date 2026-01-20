@@ -1,7 +1,9 @@
-import { useMemo } from "react";
-import styles from "./WhoAmIDisplay.module.css"; // Will create this
+import { useMemo, useState, useEffect } from "react";
+import { useParams } from 'react-router-dom';
+import styles from "./WhoAmIDisplay.module.css";
 import type { CategoryItem } from "@/shared/types/category";
-import { CATEGORIES } from "@/shared/constants/categories"; // New: extract CATEGORIES to a constant file
+import { CATEGORIES } from "@/shared/constants/categories";
+import BACKEND_URL from "@/config";
 
 type WhoAmIDisplayProps = {
   username: string;
@@ -17,6 +19,23 @@ type WhoAmIDisplayProps = {
   isCapturing?: boolean;
 };
 
+async function toggleFollow(userId: string, token: string) {
+  const res = await fetch(`${BACKEND_URL}/api/users/${userId}/follow/`, {
+    method: 'POST',
+    headers: { 'Authorization': `Token ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed to toggle follow');
+  return res.json();
+}
+
+async function fetchFollowingList(token: string) {
+  const res = await fetch(`${BACKEND_URL}/api/users/following/`, {
+    headers: { 'Authorization': `Token ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed to fetch following list');
+  return res.json();
+}
+
 export default function WhoAmIDisplay({
   username,
   iam,
@@ -30,6 +49,45 @@ export default function WhoAmIDisplay({
   showsItems,
   isCapturing,
 }: WhoAmIDisplayProps) {
+  const { userId } = useParams<{ userId: string }>();
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isMyPage, setIsMyPage] = useState(true);
+  
+  useEffect(() => {
+    const token = localStorage.getItem("userToken");
+    if (!token || !userId) {
+      setIsMyPage(true);
+      return;
+    }
+
+    // Need to get current user's ID to check if this is my page
+    fetch(`${BACKEND_URL}/dj-rest-auth/user/`, {
+      headers: { "Authorization": `Token ${token}` },
+    }).then(res => res.json()).then(data => {
+      if (data.pk.toString() === userId) {
+        setIsMyPage(true);
+      } else {
+        setIsMyPage(false);
+        // Check follow status only if it's not my page
+        fetchFollowingList(token).then(followingList => {
+          const isFollowingUser = followingList.some((user: any) => user.id.toString() === userId);
+          setIsFollowing(isFollowingUser);
+        });
+      }
+    });
+  }, [userId]);
+  
+  const handleFollow = async () => {
+    const token = localStorage.getItem("userToken");
+    if (!token || !userId) return;
+    try {
+      await toggleFollow(userId, token);
+      setIsFollowing(prev => !prev);
+    } catch (error) {
+      console.error("Failed to follow/unfollow user", error);
+    }
+  };
+
   const iamDisplay = useMemo(() => {
     return iam.trim().length > 0 ? iam : "";
   }, [iam]);
@@ -57,7 +115,6 @@ export default function WhoAmIDisplay({
 
   return (
     <div className={styles.page}>
-      {/* Profile Section */}
       <section className={`${styles.section} ${styles.profileSection}`}>
         <div className={styles.profileAvatar}>
           <img src={profileImageUrl} alt="Profile" />
@@ -65,6 +122,11 @@ export default function WhoAmIDisplay({
         <div className={styles.profileInfo}>
           <h1 className={styles.profileUsername}>{username}</h1>
           {iamDisplay && <p className={styles.profileIntro}>{iamDisplay}</p>}
+          {!isMyPage && (
+            <button onClick={handleFollow} className={styles.followButton}>
+              {isFollowing ? 'Unfollow' : 'Follow'}
+            </button>
+          )}
         </div>
       </section>
 

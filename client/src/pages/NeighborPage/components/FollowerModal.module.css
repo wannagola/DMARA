@@ -1,0 +1,87 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  z-index: 1001;
+}
+
+.modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(500px, 90%);
+  max-height: 80vh;
+  background: #232323;
+  border-radius: 24px;
+  border: 1px solid var(--primary-color-a55);
+  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.45);
+  z-index: 1002;
+  padding: 24px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.headline {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 900;
+  margin: 0 0 20px;
+}
+
+.closeButton {
+  position: absolute;
+  right: 16px;
+  top: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--primary-color);
+  font-size: 32px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.userList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+}
+
+.userItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.userItem:hover {
+  background-color: var(--primary-color-a20);
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 16px;
+  border: 1px solid var(--primary-color-a30);
+}
+
+.username {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.emptyMessage {
+  text-align: center;
+  padding: 40px 0;
+  color: rgba(255, 255, 255, 0.6);
+}

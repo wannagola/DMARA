@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions, status
+from rest_framework.generics import ListAPIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -45,6 +46,14 @@ class ProfileViewSet(viewsets.GenericViewSet):
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UserItemsView(ListAPIView):
+    serializer_class = HobbyItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        return HobbyItem.objects.filter(user_id=user_id)
 
 # 2. 관심사 아이템 (Who am I)
 class HobbyItemViewSet(viewsets.ModelViewSet):

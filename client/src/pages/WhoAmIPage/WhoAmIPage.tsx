@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import html2canvas from "html2canvas";
 import WhoAmIDisplay from "./WhoAmIDisplay";
 import styles from "./WhoAmIDisplay.module.css";
@@ -7,34 +8,44 @@ import type { CategoryItem } from "@/shared/types/category";
 import BACKEND_URL from "@/config";
 
 export default function WhoAmIPage() {
+  const { userId } = useParams<{ userId: string }>();
   const pageRef = useRef<HTMLDivElement>(null);
   const [isCapturing, setIsCapturing] = useState(false);
 
-  // --- 상태 관리 (DB 데이터) ---
   const [username, setUsername] = useState("Loading...");
   const [iam, setIam] = useState("");
   const [profileImageUrl, setProfileImageUrl] = useState(viteLogo);
   const [allItems, setAllItems] = useState<CategoryItem[]>([]);
 
-  // --- 1. 데이터 불러오기 (프로필 & 아이템) ---
   useEffect(() => {
     const fetchAllData = async () => {
       const token = localStorage.getItem("userToken");
       if (!token) return;
 
       try {
+        const profileUrl = userId 
+          ? `${BACKEND_URL}/api/users/${userId}/profile/` 
+          : `${BACKEND_URL}/api/hobbies/profile/me/`;
+        
+        const itemsUrl = userId
+          ? `${BACKEND_URL}/api/hobbies/user/${userId}/items/`
+          : `${BACKEND_URL}/api/hobbies/items/`;
+
         // (1) 프로필 가져오기
-        const profileRes = await fetch(`${BACKEND_URL}/api/hobbies/profile/me/`, {
+        const profileRes = await fetch(profileUrl, {
           headers: { "Authorization": `Token ${token}` },
         });
 
         if (profileRes.ok) {
           const pData = await profileRes.json();
-          // 닉네임
           if (pData.nickname) {
             setUsername(pData.nickname);
-          } else {
-             // 닉네임 없으면 기본 유저 정보 조회
+          } else if (pData.user?.username) { // Fallback for other users
+            setUsername(pData.user.username);
+          }
+          setIam(pData.bio || pData.introduction || "");
+          if (pData.profile_image || pData.image) setProfileImageUrl(pData.profile_image || pData.image);
+        } else if (!userId) {
              const uRes = await fetch(`${BACKEND_URL}/dj-rest-auth/user/`, {
                 headers: { "Authorization": `Token ${token}` },
              });
@@ -42,20 +53,15 @@ export default function WhoAmIPage() {
                  const uData = await uRes.json();
                  setUsername(uData.email?.split("@")[0] || "User");
              }
-          }
-          // 소개글 & 프로필 이미지
-          setIam(pData.bio || "");
-          if (pData.profile_image) setProfileImageUrl(pData.profile_image);
         }
 
         // (2) 아이템 목록 가져오기
-        const itemsRes = await fetch(`${BACKEND_URL}/api/hobbies/items/`, {
+        const itemsRes = await fetch(itemsUrl, {
           headers: { "Authorization": `Token ${token}` },
         });
 
         if (itemsRes.ok) {
           const data = await itemsRes.json();
-          // 백엔드 데이터(image_url)를 프론트엔드 형식(imageUrl)으로 변환
           const formattedItems = data.map((item: any) => ({
             ...item,
             imageUrl: item.image_url || item.image || "",
@@ -69,12 +75,10 @@ export default function WhoAmIPage() {
     };
 
     fetchAllData();
-  }, []);
+  }, [userId]);
 
 
-  // --- 2. 카테고리별 필터링 헬퍼 ---
   const getItemsByCategory = (categoryName: string) => {
-    // 백엔드 코드 매핑 (OnboardingPage와 동일하게 맞춤)
     const BACKEND_CATEGORY_MAP: Record<string, string> = {
         "Music": "MUSIC",
         "Movie": "MOVIE",
@@ -87,13 +91,11 @@ export default function WhoAmIPage() {
     
     const targetCode = BACKEND_CATEGORY_MAP[categoryName] || categoryName;
     
-    // DB 코드로 저장된 것(MUSIC)과 프론트 이름(Music) 둘 다 확인
     return allItems.filter(
       (it) => it.category === targetCode || it.category === categoryName
     );
   };
 
-  // --- 3. 캡처 및 공유 기능 ---
   useEffect(() => {
     if (isCapturing) {
       const elementToCapture = pageRef.current;
@@ -131,9 +133,11 @@ export default function WhoAmIPage() {
     setIsCapturing(true);
   };
 
+  // Do not show share button when viewing other user's page
+  const isMyPage = !userId;
+
   return (
     <div ref={pageRef} className={styles.page}>
-      {/* DB에서 가져온 데이터를 카테고리별로 나눠서 전달 */}
       <WhoAmIDisplay
         username={username}
         profileImageUrl={profileImageUrl}
@@ -148,13 +152,15 @@ export default function WhoAmIPage() {
         isCapturing={isCapturing} 
       />
 
-      <button
-        className={`${styles.shareButton} ignore-capture`}
-        type="button"
-        onClick={handleShare}
-      >
-        Share
-      </button>
+      {isMyPage && (
+        <button
+          className={`${styles.shareButton} ignore-capture`}
+          type="button"
+          onClick={handleShare}
+        >
+          Share
+        </button>
+      )}
 
       <footer className={styles.footer}>
         © 2026 D_MARA. All Rights Reserved.

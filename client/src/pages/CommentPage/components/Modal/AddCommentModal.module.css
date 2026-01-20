@@ -17,7 +17,7 @@
   max-height: calc(100% - 60px);
   background: #232323;
   border-radius: 34px;
-  border: 1px solid rgba(136, 51, 118, 0.55);
+  border: 1px solid var(--primary-color-a55);
   box-shadow: 0 26px 80px rgba(0, 0, 0, 0.45);
   z-index: 1000;
   padding: 46px 64px 40px;
@@ -37,7 +37,7 @@
   border-radius: 999px;
   border: none;
   background: transparent;
-  color: #883376;
+  color: var(--primary-color);
   font-size: 48px;
   cursor: pointer;
   line-height: 1;
@@ -88,7 +88,7 @@
 
 .control {
   position: relative;
-  border-bottom: 2px solid rgba(136, 51, 118, 0.9);
+  border-bottom: 2px solid var(--primary-color-a90);
   padding-bottom: 10px;
 }
 
@@ -154,7 +154,7 @@
   width: 40px;
   height: 40px;
   /* Purple border */
-  border: 3px solid #883376;
+  border: 3px solid var(--primary-color);
   border-radius: 4px;
   /* Allow clicks to pass through to the input */
   pointer-events: none;
@@ -168,8 +168,7 @@
   transform: translateX(-50%);
   width: 60%;
   height: 3px;
-  /* Purple top bar */
-  background-color: #883376;
+  background-color: var(--primary-color);
 }
 
 .calendarIcon::after {
@@ -181,7 +180,7 @@
   width: 40%;
   height: 3px;
   /* Purple horizontal bar */
-  background-color: #883376;
+  background-color: var(--primary-color);
 }
 
 .commentArea {
@@ -206,7 +205,7 @@
   font-weight: 650;
   line-height: 1.5;
   resize: none;
-  border-bottom: 2px solid rgba(136, 51, 118, 0.9);
+  border-bottom: 2px solid var(--primary-color-a90);
   padding: 10px 0 14px;
 }
 
@@ -239,8 +238,8 @@
   font-size: 16px;
   font-weight: 800;
   color: rgba(255, 255, 255, 0.9);
-  background: rgba(136, 51, 118, 0.2);
-  border: 1px solid rgba(136, 51, 118, 0.55);
+  background: var(--primary-color-a20);
+  border: 1px solid var(--primary-color-a55);
   padding: 10px 14px;
   border-radius: 12px;
   cursor: pointer;
@@ -265,7 +264,7 @@
   height: 64px;
   border-radius: 10px;
   border: none;
-  background: #883376;
+  background: var(--primary-color);
   color: #fff;
   font-size: 22px;
   font-weight: 900;

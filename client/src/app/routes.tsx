@@ -7,6 +7,7 @@ import WhoAmIEditPage from "@/pages/WhoAmIEditPage/WhoAmIEditPage";
 import CommentPage from "@/pages/CommentPage/CommentPage";
 import CalendarPage from "@/pages/CalendarPage/CalendarPage";
 import CommentDetailPage from "@/pages/CommentDetailPage/CommentDetailPage";
+import NeighborPage from "@/pages/NeighborPage/NeighborPage";
 
 export const router = createBrowserRouter([
   { path: "/", element: <Navigate to="/login" replace /> },
@@ -18,10 +19,12 @@ export const router = createBrowserRouter([
     children: [
       { path: "/onboarding", element: <OnboardingPage /> },
       { path: "/whoami", element: <WhoAmIPage /> },
+      { path: "/whoami/:userId", element: <WhoAmIPage /> },
       { path: "/whoami/edit", element: <WhoAmIEditPage /> },
       { path: "/comment", element: <CommentPage /> },
       { path: "/comment/:commentId", element: <CommentDetailPage /> },
       { path: "/calendar", element: <CalendarPage /> },
+      { path: "/neighbor", element: <NeighborPage /> },
     ],
   },
 ]);

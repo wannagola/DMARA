@@ -10,7 +10,7 @@
   width: 100%;
   padding: 0 40px;
   display: grid;
-  grid-template-columns: 200px 1fr 220px;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 16px;
 }
@@ -29,7 +29,7 @@
 .nav {
   display: flex;
   justify-content: center;
-  gap: 320px;
+  gap: 40px;
   font-size: 22px;
   font-weight: 600;
 }
@@ -70,18 +70,64 @@
   padding-right: 40px;
 }
 
-/* responsive */
-@media (max-width: 900px) {
-  .inner {
-    grid-template-columns: 120px 1fr 120px;
-  }
-
+/* ===== Responsive ===== */
+/* For Laptops */
+@media (max-width: 1200px) {
   .nav {
-    gap: 22px;
+    gap: 40px; /* Adjust gap for medium-large screens */
+    font-size: 20px;
+  }
+}
+
+/* For Tablets */
+@media (max-width: 992px) {
+  .inner {
+    padding: 0 24px;
+    gap: 20px;
+  }
+  .nav {
+    gap: 20px;
+    font-size: 18px;
+  }
+  .logo {
+    width: 180px;
+  }
+  .username {
+    display: none; /* Hide username on tablets and smaller */
+  }
+}
+
+/* For Mobile Phones */
+@media (max-width: 768px) {
+  .header {
+    height: 80px;
+  }
+  .inner {
+    padding: 0 16px;
+  }
+  .nav {
+    gap: 12px;
     font-size: 16px;
   }
+  .logo {
+    width: 150px;
+  }
+}
 
-  .username {
-    display: none;
+/* For Small Mobile Phones */
+@media (max-width: 480px) {
+  .nav {
+    gap: 8px;
+    font-size: 14px;
+  }
+  .navItem {
+    padding: 4px 6px;
+  }
+  .logo {
+    width: 120px;
+  }
+  .avatar {
+    width: 32px;
+    height: 32px;
   }
 }

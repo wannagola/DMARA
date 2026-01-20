@@ -1,9 +1,53 @@
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
-from .serializers import SimpleUserSerializer
+from hobbies.serializers import ProfileSerializer
+from .models import Profile
+
+
+class UserProfileView(RetrieveAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        user_id = self.kwargs.get('user_id')
+        user = get_object_or_404(User, id=user_id)
+        return get_object_or_404(Profile, user=user)
+
+
+class FollowToggleView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        me = request.user
+        target_user = get_object_or_404(User, id=user_id)
+
+        if me == target_user:
+            return Response({"message": "You cannot follow yourself."}, status=400)
+
+        # Check if the user is already following
+        if target_user in me.profile.followings.all():
+            # Unfollow
+            me.profile.followings.remove(target_user)
+            return Response({"message": f"You have unfollowed {target_user.username}."})
+        else:
+            # Follow
+            me.profile.followings.add(target_user)
+            return Response({"message": f"You are now following {target_user.username}."})
+
+class FollowingListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        me = request.user
+        following_users = me.profile.followings.all()
+        serializer = SimpleUserSerializer(following_users, many=True)
+        return Response(serializer.data)
+
 
 class CloseFriendCandidatesView(APIView):
     permission_classes = [IsAuthenticated]

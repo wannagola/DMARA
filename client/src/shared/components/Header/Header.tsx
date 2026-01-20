@@ -90,6 +90,15 @@ export default function Header() {
           >
             Calendar
           </NavLink>
+
+          <NavLink
+            to="/neighbor"
+            className={({ isActive }) =>
+              `${styles.navItem} ${isActive ? styles.active : ""}`
+            }
+          >
+            Neighbor
+          </NavLink>
         </nav>
 
         {/* Right: User Profile */}
