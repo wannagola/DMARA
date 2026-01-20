@@ -10,6 +10,8 @@ import leftBg from "@/assets/login/login_left.png";
 import logoText from "@/assets/login/logo_text.png";
 import googleBtn from "@/assets/login/google_btn.png";
 
+import BACKEND_URL from "@/config";
+
 export default function LoginPage() {
   const navigate = useNavigate();
 
@@ -20,7 +22,7 @@ export default function LoginPage() {
 
       try {
         // (1) 구글에서 받은 토큰을 백엔드(Django)로 전송
-        const response = await fetch("http://127.0.0.1:8000/api/hobbies/google/", {
+        const response = await fetch(`${BACKEND_URL}/api/hobbies/google/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

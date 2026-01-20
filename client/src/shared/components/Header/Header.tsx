@@ -4,6 +4,7 @@ import styles from "./Header.module.css";
 import logo from "@/assets/header/dmara_logo.png"; // ✅ 임시: 너의 좌측 로고 이미지로 교체해줘
 
 import defaultAvatar from "/vite.svg";
+import BACKEND_URL from "@/config";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function Header() {
 
       try {
         // ★ 1순위: Profile 모델에서 내가 수정한 닉네임 가져오기
-      const profileRes = await fetch("http://127.0.0.1:8000/api/hobbies/profile/me/", {
+      const profileRes = await fetch(`${BACKEND_URL}/api/hobbies/profile/me/`, {
         headers: { "Authorization": `Token ${token}` },
       });
 
@@ -35,7 +36,7 @@ export default function Header() {
         }
 
         // 2. 만약 Profile에 닉네임이 없다면 (최초 로그인 등), 기본 유저 정보를 가져옵니다.
-        const userRes = await fetch("http://127.0.0.1:8000/dj-rest-auth/user/", {
+        const userRes = await fetch(`${BACKEND_URL}/dj-rest-auth/user/`, {
           headers: { "Authorization": `Token ${token}` },
         });
 

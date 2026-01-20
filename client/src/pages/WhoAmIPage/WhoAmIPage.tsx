@@ -4,6 +4,7 @@ import WhoAmIDisplay from "./WhoAmIDisplay";
 import styles from "./WhoAmIDisplay.module.css";
 import viteLogo from "/vite.svg";
 import type { CategoryItem } from "@/shared/types/category";
+import BACKEND_URL from "@/config";
 
 export default function WhoAmIPage() {
   const pageRef = useRef<HTMLDivElement>(null);
@@ -23,7 +24,7 @@ export default function WhoAmIPage() {
 
       try {
         // (1) 프로필 가져오기
-        const profileRes = await fetch("http://127.0.0.1:8000/api/hobbies/profile/me/", {
+        const profileRes = await fetch(`${BACKEND_URL}/api/hobbies/profile/me/`, {
           headers: { "Authorization": `Token ${token}` },
         });
 
@@ -34,7 +35,7 @@ export default function WhoAmIPage() {
             setUsername(pData.nickname);
           } else {
              // 닉네임 없으면 기본 유저 정보 조회
-             const uRes = await fetch("http://127.0.0.1:8000/dj-rest-auth/user/", {
+             const uRes = await fetch(`${BACKEND_URL}/dj-rest-auth/user/`, {
                 headers: { "Authorization": `Token ${token}` },
              });
              if (uRes.ok) {
@@ -48,7 +49,7 @@ export default function WhoAmIPage() {
         }
 
         // (2) 아이템 목록 가져오기
-        const itemsRes = await fetch("http://127.0.0.1:8000/api/hobbies/items/", {
+        const itemsRes = await fetch(`${BACKEND_URL}/api/hobbies/items/`, {
           headers: { "Authorization": `Token ${token}` },
         });
 

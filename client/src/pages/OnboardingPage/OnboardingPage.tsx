@@ -7,6 +7,7 @@ import type { CategoryItem } from "@/shared/types/category";
 import viteLogo from "/vite.svg";
 import Modal from "@/shared/components/Modal/Modal";
 import ColorPalette from "@/shared/components/ColorPalette/ColorPalette";
+import BACKEND_URL from "@/config";
 
 export default function OnboardingPage() {
   const pageRef = useRef<HTMLDivElement>(null);
@@ -31,7 +32,7 @@ export default function OnboardingPage() {
       if (!token) return;
 
       try {
-        const profileRes = await fetch("http://127.0.0.1:8000/api/hobbies/profile/me/", {
+        const profileRes = await fetch(`${BACKEND_URL}/api/hobbies/profile/me/`, {
           headers: { Authorization: `Token ${token}` },
         });
 
@@ -41,7 +42,7 @@ export default function OnboardingPage() {
           setIam(pData.bio || "");
           if (pData.profile_image) setProfileImageUrl(pData.profile_image);
         } else {
-          const uRes = await fetch("http://127.0.0.1:8000/dj-rest-auth/user/", {
+          const uRes = await fetch(`${BACKEND_URL}/dj-rest-auth/user/`, {
             headers: { Authorization: `Token ${token}` },
           });
           if (uRes.ok) {
@@ -61,7 +62,7 @@ export default function OnboardingPage() {
     const token = localStorage.getItem("userToken");
     if (!token) return;
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/hobbies/items/", {
+      const res = await fetch(`${BACKEND_URL}/api/hobbies/items/`, {
         headers: { Authorization: `Token ${token}` },
       });
       if (res.ok) {
@@ -84,7 +85,7 @@ export default function OnboardingPage() {
     const backendCategory = BACKEND_CATEGORY_MAP[category] || "ETC";
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/hobbies/items/", {
+      const res = await fetch(`${BACKEND_URL}/api/hobbies/items/`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Token ${token}` },
         body: JSON.stringify({
@@ -104,7 +105,7 @@ export default function OnboardingPage() {
     if (!confirm("삭제하시겠습니까?")) return;
     const token = localStorage.getItem("userToken");
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/hobbies/items/${id}/`, {
+      const res = await fetch(`${BACKEND_URL}/api/hobbies/items/${id}/`, {
         method: "DELETE", headers: { Authorization: `Token ${token}` },
       });
       if (res.ok) setAllItems((prev) => prev.filter((it) => it.id !== id));
@@ -117,7 +118,7 @@ export default function OnboardingPage() {
     const token = localStorage.getItem("userToken");
     if (!token) { alert("Authentication error."); return; }
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/hobbies/profile/me/", {
+      const res = await fetch(`${BACKEND_URL}/api/hobbies/profile/me/`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Token ${token}` },
         body: JSON.stringify({ nickname: usernameDraft.trim() }),
@@ -139,7 +140,7 @@ export default function OnboardingPage() {
     const token = localStorage.getItem("userToken");
     if (!token) { alert("Authentication error."); return; }
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/hobbies/profile/me/", {
+      const res = await fetch(`${BACKEND_URL}/api/hobbies/profile/me/`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Token ${token}` },
         body: JSON.stringify({ bio: iamDraft.trim() }),
