@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./AddCommentModal.module.css";
 import CustomDatePicker from "@/shared/components/CustomDatePicker/CustomDatePicker";
+import type ReactDatePicker from "react-datepicker";
 
 export type NewCommentPayload = {
   category: string;
@@ -109,6 +110,7 @@ export default function AddCommentModal({
   const [activeIndex, setActiveIndex] = useState<number>(-1);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
+  const datePickerRef = useRef<ReactDatePicker | null>(null);
 
   const filteredSuggestions = useMemo(() => {
     const q = title.trim().toLowerCase();
@@ -363,13 +365,20 @@ export default function AddCommentModal({
             <div className={styles.label}>Date</div>
             <div className={styles.control}>
               <CustomDatePicker
+                ref={datePickerRef}
                 selected={date}
                 onChange={(newDate: Date | null) => setDate(newDate)}
                 className={styles.input}
                 placeholderText="YYYY.MM.dd"
                 dateFormat="yyyy.MM.dd"
               />
-              <span className={styles.calendarIcon} aria-hidden="true" />
+              <span
+                className={styles.calendarIcon}
+                aria-hidden="true"
+                onClick={() => {
+                  datePickerRef.current?.setFocus();
+                }}
+              />
             </div>
           </div>
 
