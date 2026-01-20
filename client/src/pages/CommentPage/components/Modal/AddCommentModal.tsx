@@ -1,7 +1,92 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./AddCommentModal.module.css";
 import CustomDatePicker from "@/shared/components/CustomDatePicker/CustomDatePicker";
-import DateInputWithIcon from "./DateInputWithIcon";
+import { DateInputWithIcon } from "./DateInputWithIcon";
+
+type Props = {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (payload: NewCommentPayload) => void;
+  category: string;
+  setCategory: (c: string) => void;
+  title: string;
+  setTitle: (t: string) => void;
+  date: Date | null;
+  setDate: (d: Date | null) => void;
+  comment: string;
+  setComment: (c: string) => void;
+  file: File | null;
+  setFile: (f: File | null) => void;
+};
+
+type LibraryItem = {
+  id: number;
+  category: string;
+  title: string;
+  date: Date;
+  imageUrl: string;
+};
+
+export type NewCommentPayload = {
+  category: string;
+  title: string;
+  date: Date;
+  comment: string;
+  imagePreviewUrl: string | null;
+};
+
+const CATEGORY_OPTIONS = [
+  "Exhibitions & Shows",
+  "Movie",
+  "Music",
+  "Sports",
+  "Etc",
+];
+
+const CONTENT_LIBRARY: LibraryItem[] = [
+  {
+    id: 1,
+    category: "Exhibitions & Shows",
+    title: "Wicked",
+    date: new Date("2026-01-16"),
+    imageUrl: "/src/assets/items/wicked.png",
+  },
+  {
+    id: 2,
+    category: "Exhibitions & Shows",
+    title: "DEADLINE : WORLD TOUR",
+    date: new Date("2025-07-05"),
+    imageUrl: "/src/assets/items/deadline.png",
+  },
+  {
+    id: 3,
+    category: "Movie",
+    title: "Interstellar",
+    date: new Date("2026-01-16"),
+    imageUrl: "/src/assets/items/interstellar.png",
+  },
+  {
+    id: 4,
+    category: "Music",
+    title: "Dynamite",
+    date: new Date("2026-01-16"),
+    imageUrl: "/src/assets/items/dynamite.png",
+  },
+  {
+    id: 5,
+    category: "Sports",
+    title: "UEFA Champions League Final",
+    date: new Date("2026-01-20"),
+    imageUrl: "/src/assets/items/champions_league.png",
+  },
+  {
+    id: 6,
+    category: "Movie",
+    title: "Avatar 2",
+    date: new Date("2026-01-20"),
+    imageUrl: "/src/assets/items/avatar2.png",
+  },
+];
 
 export default function AddCommentModal({
   isOpen,
@@ -76,14 +161,12 @@ export default function AddCommentModal({
     }
   }, [title, category, setDate]);
 
-  // ✅ 모달 닫힐 때 자동완성 상태 리셋
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!isOpen) {
       setIsListOpen(false);
       setActiveIndex(-1);
     }
-  }, [isOpen]);
+  }, [isOpen, setIsListOpen, setActiveIndex]);
 
   // ✅ 바깥 클릭하면 자동완성 리스트 닫기
   useEffect(() => {

@@ -106,19 +106,21 @@ border: 1px solid var(--primary-color-a55);
   text-align: center;
 }
 
-.inputWrapper {
-  position: relative;
-}
-
 .input {
   width: 100%;
   border: none;
   outline: none;
-  background: transparent;
-  color: #fff;
+  background: transparent; /* Dark background */
+  color: #fff; /* White text */
   font-size: 26px;
   font-weight: 700;
   padding: 6px 44px 6px 0;
+  border-bottom: 2px solid var(--primary-color-a90); /* Add bottom border for consistency */
+}
+
+.inputWrapper {
+  position: relative;
+  /* Removed explicit background to blend with theme */
 }
 
 .select option {

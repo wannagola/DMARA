@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./AddCommentModal.module.css";
 
-const DateInputWithIcon = React.forwardRef<
+export const DateInputWithIcon = React.forwardRef<
   HTMLInputElement,
   {
     value?: string;
@@ -25,4 +25,3 @@ const DateInputWithIcon = React.forwardRef<
 
 DateInputWithIcon.displayName = "DateInputWithIcon";
 
-export default DateInputWithIcon;
