@@ -82,7 +82,7 @@
   align-items: center;
   /* Remove gap from here */
 
-  background: #6a2b5f;
+  background: var(--primary-color-a50); /* Theme-consistent background */
   border-radius: 22px;
   /* Remove padding from here */
 }

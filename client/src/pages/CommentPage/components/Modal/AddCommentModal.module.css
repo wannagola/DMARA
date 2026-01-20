@@ -78,31 +78,21 @@ border: 1px solid var(--primary-color-a55);
 
 .control {
   position: relative;
-  border-bottom: 2px solid var(--primary-color-a90);
-  padding-bottom: 10px;
-}
-
-.input {
-  width: 100%;
-  border: none;
-  background: transparent;
-  color: #fff;
-  font-size: 26px;
-  font-weight: 700;
-  outline: none;
-  padding: 6px 0;
+  /* Removed border-bottom and padding-bottom from here */
 }
 
 .select {
   width: 100%;
-  border: none;
-  background: transparent;
+  border: 1px solid var(--primary-color-a50); /* Theme-consistent border */
+  background: var(--primary-color-a20); /* Theme-consistent background */
   color: #fff;
-  font-size: 26px;
+  font-size: 20px; /* Slightly smaller for better fit */
   font-weight: 700;
   outline: none;
-  padding: 6px 34px 6px 0;
+  padding: 10px 15px; /* Adjusted padding */
+  border-radius: 8px; /* Rounded corners */
   appearance: none;
+  height: 48px; /* Fixed height for consistency */
 }
 
 .calendarIcon {
