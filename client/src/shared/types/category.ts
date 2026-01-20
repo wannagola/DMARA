@@ -3,4 +3,5 @@ export type CategoryItem = {
   title: string;
   subtitle: string;
   imageUrl: string;
+  category: string;
 };

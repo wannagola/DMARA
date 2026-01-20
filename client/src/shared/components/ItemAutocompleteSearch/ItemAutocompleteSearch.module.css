@@ -4,34 +4,35 @@
 }
 
 .input {
+  box-sizing: border-box;
   width: 100%;
   border: 1px solid #883376;
   background: rgba(0, 0, 0, 0.2);
   color: #fff;
-  font-size: 24px; /* Larger font size */
+  font-size: 18px; 
   font-weight: 500;
   outline: none;
-  padding: 18px 20px; /* Larger padding */
-  border-radius: 12px; /* Larger border-radius */
-  height: 64px; /* Explicit height */
+  padding: 12px 15px; 
+  border-radius: 10px; 
+  height: 48px; 
 }
 
 .input:focus {
-  box-shadow: 0 0 0 4px rgba(136, 51, 118, 0.4); /* Larger shadow */
+  box-shadow: 0 0 0 3px rgba(136, 51, 118, 0.3); 
 }
 
 .autoList {
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(100% + 12px); /* More space below input */
+  top: calc(100% + 8px); 
   background: #3a3a3a;
-  border-radius: 16px; /* Larger border-radius */
-  padding: 12px; /* Larger padding */
+  border-radius: 12px; 
+  padding: 8px; 
   z-index: 10;
   border: 1px solid #555;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4); /* Larger shadow */
-  max-height: 800px; /* Greatly increased max-height */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); 
+  max-height: 400px; 
   overflow-y: auto;
 }
 
@@ -39,20 +40,20 @@
   width: 100%;
   border: none;
   background: transparent;
-  border-radius: 10px; /* Larger border-radius */
-  padding: 12px; /* Larger padding */
+  border-radius: 8px; 
+  padding: 8px; 
   display: grid;
-  grid-template-columns: 60px 1fr; /* Larger thumb area */
+  grid-template-columns: 45px 1fr; 
   align-items: center;
-  gap: 16px; /* Larger gap */
+  gap: 12px; 
   cursor: pointer;
   color: #fff;
   text-align: left;
-  min-height: 80px; /* Minimum height for better spacing */
+  min-height: 60px; 
 }
 
 .autoItem:not(:last-child) {
-  margin-bottom: 6px; /* More space between items */
+  margin-bottom: 4px; 
 }
 
 .autoItem:hover,
@@ -61,9 +62,9 @@
 }
 
 .autoThumb {
-  width: 60px; /* Larger thumb */
-  height: 60px; /* Larger thumb */
-  border-radius: 8px; /* Larger border-radius */
+  width: 45px; 
+  height: 45px; 
+  border-radius: 6px; 
   object-fit: cover;
 }
 
@@ -72,7 +73,7 @@
 }
 
 .autoTitle {
-  font-size: 20px; /* Larger font size */
+  font-size: 16px; 
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -80,8 +81,8 @@
 }
 
 .noResults {
-  padding: 30px; /* Larger padding */
+  padding: 20px; 
   text-align: center;
   color: #aaa;
-  font-size: 18px; /* Larger font size */
+  font-size: 14px; 
 }
