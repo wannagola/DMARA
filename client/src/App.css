@@ -1,8 +1,9 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0; /* 강제로 들어간 2rem 패딩 제거 */
+  text-align: left; /* 기본 정렬을 왼쪽으로 변경 */
 }
 
 .logo {
