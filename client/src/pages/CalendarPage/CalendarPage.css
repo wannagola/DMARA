@@ -11,6 +11,8 @@
   width: 100%;
   max-width: 800px; /* Smaller calendar width */
   margin-bottom: 40px;
+  margin-left: auto; /* Push to the right */
+  margin-right: 10%; /* Adjust as needed */
 }
 
 /* General overrides for dark theme */
