@@ -10,16 +10,21 @@
   position: fixed;
   left: 50%;
   top: 50%;
+  /* Adjusted top to center vertically */
   transform: translate(-50%, -50%);
   width: min(900px, calc(100% - 80px));
+  /* Increased max-height */
   max-height: calc(100% - 60px);
   background: #232323;
-  border: 1px solid var(--primary-color-a55);
+  border-radius: 34px;
+  border: 1px solid rgba(136, 51, 118, 0.55);
   box-shadow: 0 26px 80px rgba(0, 0, 0, 0.45);
   z-index: 1000;
   padding: 46px 64px 40px;
   color: #fff;
+  /* Added flexbox for layout */
   display: flex;
+  /* Stack children vertically */
   flex-direction: column;
 }
 
@@ -32,7 +37,7 @@
   border-radius: 999px;
   border: none;
   background: transparent;
-  color: var(--primary-color);
+  color: #883376;
   font-size: 48px;
   cursor: pointer;
   line-height: 1;
@@ -44,6 +49,7 @@
   font-weight: 900;
   letter-spacing: 0.02em;
   margin: 0 0 36px;
+  /* Prevent headline from shrinking */
   flex-shrink: 0;
 }
 
@@ -51,9 +57,13 @@
   display: flex;
   flex-direction: column;
   gap: 26px;
+  /* Make form scrollable */
   overflow-y: auto;
+  /* Allow form to take available vertical space */
   flex: 1;
+  /* Add padding for scrollbar if present */
   padding-right: 10px;
+  /* Space before actions */
   margin-bottom: 20px;
 }
 
@@ -78,7 +88,7 @@
 
 .control {
   position: relative;
-  border-bottom: 2px solid var(--primary-color-a90);
+  border-bottom: 2px solid rgba(136, 51, 118, 0.9);
   padding-bottom: 10px;
 }
 
@@ -93,11 +103,29 @@
   padding: 6px 0;
 }
 
+.input[type="date"] {
+  position: relative;
+  /* color styles are removed as they are handled by the calendarIcon */
+}
+
+/* Hide the native calendar picker indicator */
+.input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* ✅ Category select: "입력창과 동일하게" = 배경 투명 (모달 배경이 보이게) */
 .select {
   width: 100%;
   border: none;
-  background: transparent;
-  color: var(--primary-color);
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #fff;
   font-size: 26px;
   font-weight: 700;
   outline: none;
@@ -105,15 +133,30 @@
   appearance: none;
 }
 
+/* ✅ 드롭다운 옵션 리스트 배경(펼쳤을 때) */
+.select option {
+  background-color: #232323;
+  color: #fff;
+}
+
+/* (원하면) 선택된 옵션 강조색 */
+.select option:checked {
+  background-color: #141414;
+}
+
+/* Styling for the custom calendar icon */
 .calendarIcon {
   position: absolute;
   right: 4px;
   top: 50%;
   transform: translateY(-50%);
+  /* Larger icon size */
   width: 40px;
   height: 40px;
-  border: 3px solid var(--primary-color);
+  /* Purple border */
+  border: 3px solid #883376;
   border-radius: 4px;
+  /* Allow clicks to pass through to the input */
   pointer-events: none;
 }
 
@@ -125,7 +168,8 @@
   transform: translateX(-50%);
   width: 60%;
   height: 3px;
-  background-color: var(--primary-color);
+  /* Purple top bar */
+  background-color: #883376;
 }
 
 .calendarIcon::after {
@@ -136,14 +180,18 @@
   transform: translate(-50%, -50%);
   width: 40%;
   height: 3px;
-  background-color: var(--primary-color);
+  /* Purple horizontal bar */
+  background-color: #883376;
 }
 
 .commentArea {
   position: relative;
   margin-top: 8px;
+  /* Use flexbox */
   display: flex;
+  /* Stack children vertically */
   flex-direction: column;
+  /* Space between previewBox and uploadBtn */
   gap: 10px;
 }
 
@@ -158,13 +206,14 @@
   font-weight: 650;
   line-height: 1.5;
   resize: none;
-  border-bottom: 2px solid var(--primary-color-a90);
+  border-bottom: 2px solid rgba(136, 51, 118, 0.9);
   padding: 10px 0 14px;
 }
 
 .previewBox {
   margin-top: 26px;
   width: 100%;
+  /* Reduced height to give space */
   height: 200px;
   border-radius: 18px;
   background: #141414;
@@ -185,15 +234,19 @@
 
 .uploadBtn {
   position: static;
+  /* Remove absolute positioning */
+  /* Remove top, left, transform properties */
   font-size: 16px;
   font-weight: 800;
   color: rgba(255, 255, 255, 0.9);
-  background: var(--primary-color-a20);
-  border: 1px solid var(--primary-color-a55);
+  background: rgba(136, 51, 118, 0.2);
+  border: 1px solid rgba(136, 51, 118, 0.55);
   padding: 10px 14px;
   border-radius: 12px;
   cursor: pointer;
+  /* Align to start in flex column */
   align-self: flex-start;
+  /* Adjust width to content */
   width: fit-content;
 }
 
@@ -212,7 +265,7 @@
   height: 64px;
   border-radius: 10px;
   border: none;
-  background: var(--primary-color);
+  background: #883376;
   color: #fff;
   font-size: 22px;
   font-weight: 900;
@@ -222,104 +275,6 @@
 .disabled {
   opacity: 0.45;
   cursor: not-allowed;
-}
-
-/* =========================================
-   ✅ AutoComplete styles
-   ========================================= */
-
-.autoList {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(100% + 10px);
-  background: var(--primary-color-a55);
-  border-radius: 18px;
-  padding: 12px;
-  z-index: 5;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
-}
-
-.autoItem {
-  width: 100%;
-  border: none;
-  background: rgba(25, 25, 25, 0.75);
-  border-radius: 16px;
-  padding: 12px 12px;
-  display: grid;
-  grid-template-columns: 56px 1fr auto;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  color: #fff;
-  text-align: left;
-  margin-bottom: 10px;
-}
-
-.autoItem:last-child {
-  margin-bottom: 0;
-}
-
-.autoItemActive {
-  outline: 2px solid rgba(255, 255, 255, 0.28);
-  background: rgba(10, 10, 10, 0.9);
-}
-
-.autoThumb {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  object-fit: cover;
-}
-
-.autoText {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.autoTitle {
-  font-size: 20px;
-  font-weight: 900;
-
-  /* ✅ line-clamp (표준 + webkit) */
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  overflow: hidden;
-}
-
-.autoSub {
-  font-size: 14px;
-  font-weight: 700;
-  opacity: 0.9;
-
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  overflow: hidden;
-}
-
-.autoRight {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  opacity: 0.95;
-  white-space: nowrap;
-}
-
-.autoDate {
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.autoChev {
-  font-size: 18px;
-  font-weight: 900;
 }
 
 @media (max-width: 900px) {
@@ -339,14 +294,5 @@
   }
   .label {
     font-size: 26px;
-  }
-
-  .autoItem {
-    grid-template-columns: 48px 1fr auto;
-  }
-  .autoThumb {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
   }
 }

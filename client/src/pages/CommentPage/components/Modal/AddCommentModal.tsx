@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo } from "react";
 import styles from "./AddCommentModal.module.css";
 import CustomDatePicker from "@/shared/components/CustomDatePicker/CustomDatePicker";
 
@@ -14,7 +14,6 @@ type Props = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (payload: NewCommentPayload) => void;
-
   // Controlled component props
   category: string;
   setCategory: (value: string) => void;
@@ -39,43 +38,6 @@ const CATEGORY_OPTIONS = [
   "Shows",
 ];
 
-/**
- * ✅ 자동완성용 "콘텐츠 라이브러리" (임시/mock)
- * - 실제로는 나중에 서버/API 결과로 바꾸면 됨
- * - 요구사항: "Category로 1차 필터 + Title 검색(자동완성) + 선택 시 Date 자동 세팅"
- */
-type LibraryItem = {
-  id: number;
-  category: string;
-  title: string;
-  date: Date;
-  imageUrl: string;
-};
-
-const CONTENT_LIBRARY: LibraryItem[] = [
-  {
-    id: 1,
-    category: "Exhibitions & Shows",
-    title: "Wicked",
-    date: new Date("2026-01-16"),
-    imageUrl: "/src/assets/items/music1.jpeg",
-  },
-  {
-    id: 2,
-    category: "Exhibitions & Shows",
-    title: "DEADLINE : WORLD TOUR",
-    date: new Date("2025-07-05"),
-    imageUrl: "/src/assets/items/music2.jpeg",
-  },
-  {
-    id: 3,
-    category: "Movie",
-    title: "Interstellar",
-    date: new Date("2025-12-24"),
-    imageUrl: "/src/assets/items/music3.jpeg",
-  },
-];
-
 export default function AddCommentModal({
   isOpen,
   onClose,
@@ -97,90 +59,13 @@ export default function AddCommentModal({
   }, [file]);
 
   useEffect(() => {
+    // Cleanup object URL when component unmounts or file changes
     return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
-
-  // =========================
-  // ✅ AutoComplete State
-  // =========================
-  const [isListOpen, setIsListOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState<number>(-1);
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const listRef = useRef<HTMLDivElement | null>(null);
-
-  const filteredSuggestions = useMemo(() => {
-    const q = title.trim().toLowerCase();
-
-    const inCategory = CONTENT_LIBRARY.filter((it) => it.category === category);
-
-    if (q.length === 0) return inCategory;
-
-    return inCategory.filter((it) => it.title.toLowerCase().includes(q));
-  }, [category, title]);
-
-  const applySuggestion = (it: LibraryItem) => {
-    setTitle(it.title);
-
-    // ✅ Date 자동 세팅
-    setDate(it.date);
-
-    // (선택) 이미지도 자동 세팅하고 싶으면, url로 File 만들기는 브라우저 보안상 번거로움.
-    // 지금은 "제목/날짜 자동세팅"까지만 확정.
-    setIsListOpen(false);
-    setActiveIndex(-1);
-
-    // UX: 입력 포커스 유지
-    requestAnimationFrame(() => inputRef.current?.focus());
-  };
-
-  // ✅ title을 타이핑하다가 "정확히 일치"하면 date 자동 세팅 (원하면 유지)
-  useEffect(() => {
-    const q = title.trim().toLowerCase();
-    if (!q) return;
-
-    const exact = CONTENT_LIBRARY.find(
-      (it) => it.category === category && it.title.toLowerCase() === q,
-    );
-
-    if (exact) {
-      setDate(exact.date);
-    }
-  }, [title, category, setDate]);
-
-  // ✅ 모달 닫힐 때 자동완성 상태 리셋
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    if (!isOpen) {
-      setIsListOpen(false);
-      setActiveIndex(-1);
-    }
-  }, [isOpen]);
-
-  // ✅ 바깥 클릭하면 자동완성 리스트 닫기
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const onDocMouseDown = (e: MouseEvent) => {
-      const target = e.target as Node;
-      const inputEl = inputRef.current;
-      const listEl = listRef.current;
-
-      if (!inputEl || !listEl) return;
-
-      const clickedInput = inputEl.contains(target);
-      const clickedList = listEl.contains(target);
-
-      if (!clickedInput && !clickedList) {
-        setIsListOpen(false);
-        setActiveIndex(-1);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
       }
     };
-
-    document.addEventListener("mousedown", onDocMouseDown);
-    return () => document.removeEventListener("mousedown", onDocMouseDown);
-  }, [isOpen]);
+  }, [previewUrl]);
 
   if (!isOpen) return null;
 
@@ -227,12 +112,7 @@ export default function AddCommentModal({
               <select
                 className={styles.select}
                 value={category}
-                onChange={(e) => {
-                  setCategory(e.target.value);
-                  // ✅ 카테고리 바꾸면 자동완성 상태 초기화
-                  setIsListOpen(false);
-                  setActiveIndex(-1);
-                }}
+                onChange={(e) => setCategory(e.target.value)}
               >
                 {CATEGORY_OPTIONS.map((opt) => (
                   <option key={opt} value={opt}>
@@ -244,117 +124,16 @@ export default function AddCommentModal({
             </div>
           </div>
 
-          {/* Title (✅ 자동완성) */}
+          {/* Title */}
           <div className={styles.row}>
             <div className={styles.label}>Title</div>
-
             <div className={styles.control}>
               <input
-                ref={inputRef}
                 className={styles.input}
                 value={title}
-                onChange={(e) => {
-                  setTitle(e.target.value);
-                  setIsListOpen(true);
-                  setActiveIndex(-1);
-                }}
-                onFocus={() => {
-                  setIsListOpen(true);
-                }}
-                onKeyDown={(e) => {
-                  if (!isListOpen) return;
-
-                  if (e.key === "ArrowDown") {
-                    e.preventDefault();
-                    if (filteredSuggestions.length === 0) return;
-
-                    setActiveIndex((prev) => {
-                      const next = prev + 1;
-                      return next >= filteredSuggestions.length ? 0 : next;
-                    });
-                    return;
-                  }
-
-                  if (e.key === "ArrowUp") {
-                    e.preventDefault();
-                    if (filteredSuggestions.length === 0) return;
-
-                    setActiveIndex((prev) => {
-                      const next = prev - 1;
-                      return next < 0 ? filteredSuggestions.length - 1 : next;
-                    });
-                    return;
-                  }
-
-                  if (e.key === "Enter") {
-                    if (filteredSuggestions.length === 0) return;
-
-                    // ✅ activeIndex가 없으면 0번째 선택
-                    const idx =
-                      activeIndex >= 0
-                        ? activeIndex
-                        : Math.min(0, filteredSuggestions.length - 1);
-                    const picked = filteredSuggestions[idx];
-                    if (!picked) return;
-
-                    e.preventDefault();
-                    applySuggestion(picked);
-                    return;
-                  }
-
-                  if (e.key === "Escape") {
-                    setIsListOpen(false);
-                    setActiveIndex(-1);
-                  }
-                }}
+                onChange={(e) => setTitle(e.target.value)}
                 placeholder=""
-                autoComplete="off"
               />
-
-              {/* ✅ 자동완성 리스트 */}
-              {isListOpen && filteredSuggestions.length > 0 && (
-                <div ref={listRef} className={styles.autoList} role="listbox">
-                  {filteredSuggestions.map((it, idx) => {
-                    const isActive = idx === activeIndex;
-                    return (
-                      <button
-                        key={it.id}
-                        type="button"
-                        className={`${styles.autoItem} ${
-                          isActive ? styles.autoItemActive : ""
-                        }`}
-                        onMouseEnter={() => setActiveIndex(idx)}
-                        onClick={() => applySuggestion(it)}
-                      >
-                        <img
-                          className={styles.autoThumb}
-                          src={it.imageUrl}
-                          alt={it.title}
-                        />
-                        <div className={styles.autoText}>
-                          <div className={styles.autoTitle} title={it.title}>
-                            {it.title}
-                          </div>
-                          <div className={styles.autoSub}>{it.category}</div>
-                        </div>
-                        <div className={styles.autoRight}>
-                          <span className={styles.autoDate}>
-                            {`${it.date.getFullYear()}.${String(
-                              it.date.getMonth() + 1,
-                            ).padStart(
-                              2,
-                              "0",
-                            )}.${String(it.date.getDate()).padStart(2, "0")}`}
-                          </span>
-                          <span className={styles.autoChev} aria-hidden="true">
-                            ▾
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
             </div>
           </div>
 
