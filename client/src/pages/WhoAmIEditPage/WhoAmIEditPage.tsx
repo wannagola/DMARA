@@ -10,13 +10,13 @@ import ItemAutocompleteSearch, {
 
 // 백엔드 카테고리 코드 매핑
 const BACKEND_CATEGORY_MAP: Record<string, string> = {
-    "Music": "MUSIC",
-    "Movie": "MOVIE",
-    "Talent": "ACTOR", // Talent는 ACTOR/IDOL을 포함하므로 대표로 ACTOR 사용
-    "Sports": "SPORTS",
-    "Matches": "MATCH",
-    "Drama & OTT": "DRAMA",
-    "Shows": "EXHIBITION",
+  Music: "MUSIC",
+  Movie: "MOVIE",
+  Talent: "ACTOR", // Talent는 ACTOR/IDOL을 포함하므로 대표로 ACTOR 사용
+  Sports: "SPORTS",
+  Matches: "MATCH",
+  "Drama & OTT": "DRAMA",
+  Shows: "EXHIBITION",
 };
 
 export default function WhoAmIEditPage() {
@@ -33,51 +33,54 @@ export default function WhoAmIEditPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<CategoryKey | null>(
-    null
+    null,
   );
-  
+
   // 데이터 로딩
   useEffect(() => {
     const fetchItems = async () => {
-       const token = localStorage.getItem("userToken");
-       if (!token) return;
-       try {
-         const res = await fetch("http://127.0.0.1:8000/api/hobbies/items/", {
-           headers: { "Authorization": `Token ${token}` },
-         });
-         if (res.ok) {
-           const data = await res.json();
-           
-           const newItemsState = { ...items };
-           
-           // API 데이터를 프론트엔드 카테고리 키에 맞게 그룹화
-           CATEGORIES.forEach(catName => {
-               const backendCode = BACKEND_CATEGORY_MAP[catName] || catName;
-               
-               const categoryItems = data.filter((item: any) => 
-                   item.category === backendCode
-               ).map((item: any) => ({ // 데이터 형식 변환
-                   ...item,
-                   imageUrl: item.image_url || item.image || "",
-               }));
+      const token = localStorage.getItem("userToken");
+      if (!token) return;
+      try {
+        const res = await fetch("http://127.0.0.1:8000/api/hobbies/items/", {
+          headers: { Authorization: `Token ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
 
-               // Talent는 ACTOR와 IDOL을 합쳐야 함
-               if (catName === "Talent") {
-                    const idolItems = data.filter((item:any) => item.category === 'IDOL').map((item: any) => ({
-                       ...item,
-                       imageUrl: item.image_url || item.image || "",
-                    }));
-                    newItemsState[catName] = [...categoryItems, ...idolItems];
-               } else {
-                   newItemsState[catName] = categoryItems;
-               }
-           });
+          const newItemsState = { ...items };
 
-           setItems(newItemsState);
-         }
-       } catch (err) {
-         console.error("Failed to fetch items", err);
-       }
+          // API 데이터를 프론트엔드 카테고리 키에 맞게 그룹화
+          CATEGORIES.forEach((catName) => {
+            const backendCode = BACKEND_CATEGORY_MAP[catName] || catName;
+
+            const categoryItems = data
+              .filter((item: any) => item.category === backendCode)
+              .map((item: any) => ({
+                // 데이터 형식 변환
+                ...item,
+                imageUrl: item.image_url || item.image || "",
+              }));
+
+            // Talent는 ACTOR와 IDOL을 합쳐야 함
+            if (catName === "Talent") {
+              const idolItems = data
+                .filter((item: any) => item.category === "IDOL")
+                .map((item: any) => ({
+                  ...item,
+                  imageUrl: item.image_url || item.image || "",
+                }));
+              newItemsState[catName] = [...categoryItems, ...idolItems];
+            } else {
+              newItemsState[catName] = categoryItems;
+            }
+          });
+
+          setItems(newItemsState);
+        }
+      } catch (err) {
+        console.error("Failed to fetch items", err);
+      }
     };
     fetchItems();
   }, []);
@@ -98,12 +101,12 @@ export default function WhoAmIEditPage() {
     // LibraryItem을 CategoryItem으로 변환
     const newCategoryItem: CategoryItem = {
       // id는 임시로 Date.now() 사용. 백엔드에서 실제 id를 부여해야 함.
-      id: Date.now() + Math.random(), 
+      id: Date.now() + Math.random(),
       title: newItem.title,
       subtitle: newItem.subtitle,
       imageUrl: newItem.imageUrl,
       // API 전송 시에는 백엔드 코드로 보내야 함
-      category: selectedCategory, 
+      category: selectedCategory,
     };
 
     setItems((prev) => ({
@@ -123,51 +126,57 @@ export default function WhoAmIEditPage() {
   const handleSave = async () => {
     const token = localStorage.getItem("userToken");
     if (!token) {
-        alert("Please log in.");
-        return;
+      alert("Please log in.");
+      return;
     }
-    
-    // 프론트엔드 상태를 백엔드로 보낼 payload로 변환
-    const payload = Object.entries(items).flatMap(([categoryName, categoryItems]) => {
-        return categoryItems.map(item => {
-            const backendCategory = BACKEND_CATEGORY_MAP[categoryName as CategoryKey] || categoryName;
-            
-            // Talent의 경우, subtitle을 보고 ACTOR/ARTIST 구분
-            let finalCategory = backendCategory;
-            if (categoryName === 'Talent') {
-                if (item.subtitle === 'ARTIST') finalCategory = 'IDOL';
-                else if (item.subtitle === 'ACTOR') finalCategory = 'ACTOR';
-            }
 
-            return {
-                title: item.title,
-                category: finalCategory,
-                image_url: item.imageUrl,
-                // subtitle은 백엔드 모델에 따라 포함 여부 결정 (현재는 미포함)
-            };
+    // 프론트엔드 상태를 백엔드로 보낼 payload로 변환
+    const payload = Object.entries(items).flatMap(
+      ([categoryName, categoryItems]) => {
+        return categoryItems.map((item) => {
+          const backendCategory =
+            BACKEND_CATEGORY_MAP[categoryName as CategoryKey] || categoryName;
+
+          // Talent의 경우, subtitle을 보고 ACTOR/ARTIST 구분
+          let finalCategory = backendCategory;
+          if (categoryName === "Talent") {
+            if (item.subtitle === "ARTIST") finalCategory = "IDOL";
+            else if (item.subtitle === "ACTOR") finalCategory = "ACTOR";
+          }
+
+          return {
+            title: item.title,
+            category: finalCategory,
+            image_url: item.imageUrl,
+            // subtitle은 백엔드 모델에 따라 포함 여부 결정 (현재는 미포함)
+          };
         });
-    });
+      },
+    );
 
     try {
-        const res = await fetch("http://127.0.0.1:8000/api/hobbies/items/bulk_update/", {
-            method: 'POST',
-            headers: {
-                "Authorization": `Token ${token}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-        });
+      const res = await fetch(
+        "http://127.0.0.1:8000/api/hobbies/items/bulk_update/",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        },
+      );
 
-        if (res.ok) {
-            alert("Saved successfully!");
-            navigate("/whoami");
-        } else {
-            const errorData = await res.json();
-            alert("Failed to save: " + JSON.stringify(errorData));
-        }
+      if (res.ok) {
+        alert("Saved successfully!");
+        navigate("/whoami");
+      } else {
+        const errorData = await res.json();
+        alert("Failed to save: " + JSON.stringify(errorData));
+      }
     } catch (err) {
-        console.error("Save error:", err);
-        alert("An error occurred while saving.");
+      console.error("Save error:", err);
+      alert("An error occurred while saving.");
     }
   };
 

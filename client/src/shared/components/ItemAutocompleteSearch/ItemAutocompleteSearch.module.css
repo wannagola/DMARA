@@ -30,7 +30,7 @@
   border-radius: 12px; 
   padding: 8px; 
   z-index: 10;
-  border: 1px solid #555;
+  border: 1px solid var(--primary-color-a50); /* Theme-consistent border */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); 
   max-height: 400px; 
   overflow-y: auto;
