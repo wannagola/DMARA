@@ -7,6 +7,7 @@ import Modal from "@/shared/components/Modal/Modal";
 import ItemAutocompleteSearch, {
   LibraryItem,
 } from "@/shared/components/ItemAutocompleteSearch/ItemAutocompleteSearch";
+import BACKEND_URL from "@/config";
 
 // 백엔드 카테고리 코드 매핑
 const BACKEND_CATEGORY_MAP: Record<string, string> = {
@@ -42,7 +43,7 @@ export default function WhoAmIEditPage() {
       const token = localStorage.getItem("userToken");
       if (!token) return;
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/hobbies/items/", {
+        const res = await fetch(`${BACKEND_URL}/api/hobbies/items/`, {
           headers: { Authorization: `Token ${token}` },
         });
         if (res.ok) {
@@ -155,17 +156,14 @@ export default function WhoAmIEditPage() {
     );
 
     try {
-      const res = await fetch(
-        "http://127.0.0.1:8000/api/hobbies/items/bulk_update/",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
+      const res = await fetch(`${BACKEND_URL}/api/hobbies/items/bulk_update/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(payload),
+      });
 
       if (res.ok) {
         alert("Saved successfully!");
