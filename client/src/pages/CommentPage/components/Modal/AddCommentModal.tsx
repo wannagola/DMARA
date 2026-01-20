@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./AddCommentModal.module.css";
 import CustomDatePicker from "@/shared/components/CustomDatePicker/CustomDatePicker";
-import type ReactDatePicker from "react-datepicker";
 
 export type NewCommentPayload = {
   category: string;
@@ -77,6 +76,30 @@ const CONTENT_LIBRARY: LibraryItem[] = [
   },
 ];
 
+const DateInputWithIcon = React.forwardRef<
+  HTMLInputElement,
+  {
+    value?: string;
+    onClick?: () => void;
+    placeholder?: string;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  }
+>(({ value, onClick, placeholder, onChange }, ref) => (
+  // The whole thing is clickable to open the datepicker
+  <div className={styles.inputWrapper} onClick={onClick}>
+    <input
+      ref={ref}
+      className={styles.input}
+      readOnly // Make it readonly as it's controlled by the picker
+      value={value}
+      placeholder={placeholder}
+      onChange={onChange}
+    />
+    <span className={styles.calendarIcon} aria-hidden="true" />
+  </div>
+));
+DateInputWithIcon.displayName = "DateInputWithIcon";
+
 export default function AddCommentModal({
   isOpen,
   onClose,
@@ -110,7 +133,6 @@ export default function AddCommentModal({
   const [activeIndex, setActiveIndex] = useState<number>(-1);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
-  const datePickerRef = useRef<ReactDatePicker | null>(null);
 
   const filteredSuggestions = useMemo(() => {
     const q = title.trim().toLowerCase();
@@ -365,19 +387,11 @@ export default function AddCommentModal({
             <div className={styles.label}>Date</div>
             <div className={styles.control}>
               <CustomDatePicker
-                ref={datePickerRef}
                 selected={date}
                 onChange={(newDate: Date | null) => setDate(newDate)}
-                className={styles.input}
                 placeholderText="YYYY.MM.dd"
                 dateFormat="yyyy.MM.dd"
-              />
-              <span
-                className={styles.calendarIcon}
-                aria-hidden="true"
-                onClick={() => {
-                  datePickerRef.current?.setFocus();
-                }}
+                customInput={<DateInputWithIcon />}
               />
             </div>
           </div>

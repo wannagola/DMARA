@@ -106,6 +106,10 @@ border: 1px solid var(--primary-color-a55);
   text-align: center;
 }
 
+.inputWrapper {
+  position: relative;
+}
+
 .input {
   width: 100%;
   border: none;
