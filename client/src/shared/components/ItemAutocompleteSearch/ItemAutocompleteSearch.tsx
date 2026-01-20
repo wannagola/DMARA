@@ -67,7 +67,7 @@ export default function ItemAutocompleteSearch({
           const actors = (actorData.results || []).map((item: any) => ({ ...item, customType: "ACTOR" }));
           const idols = (idolData.results || []).map((item: any) => ({ ...item, customType: "ARTIST" }));
 
-          rawResults = [...actors, ...idols];
+          rawResults = [...idols, ...actors];
         
         } else {
           // 나머지 카테고리
