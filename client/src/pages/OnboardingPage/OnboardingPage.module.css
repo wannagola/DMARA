@@ -92,6 +92,30 @@
   margin-bottom: 8px; /* Space below username */
 }
 
+.profileUsernameWrap, .profileIntroWrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.inlineEditBtn {
+  background: transparent;
+  border: 1px solid #777;
+  color: #aaa;
+  border-radius: 8px;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.2s;
+}
+
+.inlineEditBtn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #aaa;
+}
+
 .profileIntro {
   font-size: 20px; /* Slightly smaller intro */
   color: rgba(255, 255, 255, 0.8);
@@ -130,8 +154,8 @@
 }
 .iamInput:focus,
 .usernameInput:focus {
-  border-color: rgba(136, 51, 118, 0.75);
-  box-shadow: 0 0 0 4px rgba(136, 51, 118, 0.18);
+  border-color: var(--primary-color-a75);
+  box-shadow: 0 0 0 4px var(--primary-color-a18);
 }
 
 .iamSaveButton {
@@ -139,7 +163,7 @@
   padding: 0 24px;
   border-radius: 10px;
   border: none;
-  background: #883376;
+  background: var(--primary-color);
   color: #ffffff;
   font-weight: 700;
   cursor: pointer;
@@ -217,7 +241,7 @@
 }
 .emptyState:hover {
   background: #3a3a3a;
-  border-color: #883376;
+  border-color: var(--primary-color);
 }
 
 /* Save Button */
@@ -228,7 +252,7 @@
   height: 50px;
   border-radius: 25px;
   border: none;
-  background: #883376;
+  background: var(--primary-color);
   color: #ffffff;
   font-size: 16px;
   font-weight: 700;

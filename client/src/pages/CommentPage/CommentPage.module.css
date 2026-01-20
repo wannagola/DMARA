@@ -27,7 +27,7 @@
 }
 
 .active {
-  background: #883376;
+  background: var(--primary-color);
 }
 
 /* 리스트 */
@@ -215,7 +215,7 @@
   height: 140px;
   border-radius: 999px;
   border: none;
-  background: #883376;
+  background: var(--primary-color);
   color: #fff;
   font-size: 34px;
   font-weight: 900;

@@ -1,0 +1,36 @@
+.pickerWrapper {
+  display: flex;
+  justify-content: center;
+  /* Add padding if needed */
+  padding: 20px 0;
+}
+
+/* Override react-color SketchPicker styles */
+.sketchPicker {
+  /* This targets the outermost div of the SketchPicker */
+  background: #2a2a2a !important; /* Dark background */
+  box-shadow: none !important; /* Remove default shadow */
+  border-radius: 8px !important;
+  padding: 12px !important; /* Adjust padding */
+  border: 1px solid #555 !important;
+}
+
+.sketchPicker .sketch-picker__color-wrap { /* For the small color input display */
+  background: #3a3a3a !important;
+  border: 1px solid #666 !important;
+}
+
+.sketchPicker .sketch-picker__alpha-wrap { /* For the alpha slider */
+  background: #3a3a3a !important;
+  border: 1px solid #666 !important;
+}
+
+.sketchPicker input { /* For the RGB/HEX input fields */
+  background: #3a3a3a !important;
+  color: #fff !important;
+  border: 1px solid #666 !important;
+}
+
+.sketchPicker label { /* For the RGB/HEX labels */
+  color: #bbb !important;
+}

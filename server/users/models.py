@@ -7,6 +7,10 @@ class Profile(models.Model):
     # upload_to: 이미지가 저장될 폴더 이름 (media/profile_pics/ 에 저장됨)
     # blank=True: 프사 없이 가입해도 됨
     profile_image = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    nickname = models.CharField(max_length=30, default='Anonymous', blank=True)
+    introduction = models.CharField(max_length=100, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     # 1. 내가 팔로우하는 사람들 (Following)
     # symmetrical=False: 내가 팔로우한다고 상대방도 나를 자동으로 팔로우하는 건 아님 (인스타 방식)

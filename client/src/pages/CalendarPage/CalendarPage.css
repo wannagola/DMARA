@@ -71,14 +71,14 @@
 
 .rbc-toolbar button:hover,
 .rbc-toolbar button:focus {
-  background-color: #883376;
-  border-color: #883376;
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
   opacity: 1;
 }
 
 .rbc-toolbar button.rbc-active {
-  background-color: #883376;
-  border-color: #883376;
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .rbc-btn-group {
@@ -108,7 +108,7 @@
 }
 
 .rbc-day-selected {
-  background-color: rgba(136, 51, 118, 0.4) !important;
+  background-color: var(--primary-color-a40) !important;
 }
 
 .rbc-off-range-bg {
@@ -116,12 +116,12 @@
 }
 
 .rbc-today {
-  background-color: rgba(136, 51, 118, 0.2);
+  background-color: var(--primary-color-a20);
 }
 
 .rbc-event {
-  background-color: #6a285d;
-  border: 1px solid #883376;
+  background-color: var(--primary-color);
+  border: 1px solid var(--primary-color);
   color: #fff;
   padding: 2px 5px;
   border-radius: 4px;
@@ -210,7 +210,7 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: rgba(210, 170, 205, 0.3);
+  background: var(--primary-color-a30);
 }
 
 .comment-heart {

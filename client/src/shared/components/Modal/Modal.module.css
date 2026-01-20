@@ -17,7 +17,7 @@
   width: min(640px, calc(100vw - 48px));
   background: #2a2a2a;
   border-radius: 18px;
-  border: 1px solid rgba(136, 51, 118, 0.35);
+  border: 1px solid var(--primary-color-a35);
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55);
   z-index: 1000;
   overflow: hidden;
@@ -46,7 +46,7 @@
   height: 42px;
   border-radius: 12px;
   border: none;
-  background: rgba(136, 51, 118, 0.45);
+  background: var(--primary-color-a45);
   color: #fff;
   font-size: 26px;
   cursor: pointer;
@@ -83,8 +83,8 @@
 }
 
 .input:focus {
-  border-color: rgba(136, 51, 118, 0.75);
-  box-shadow: 0 0 0 4px rgba(136, 51, 118, 0.18);
+  border-color: var(--primary-color-a75);
+  box-shadow: 0 0 0 4px var(--primary-color-a18);
 }
 
 .actions {
@@ -109,7 +109,7 @@
   padding: 0 18px;
   border-radius: 10px;
   border: none;
-  background: #883376;
+  background: var(--primary-color);
   color: #ffffff;
   font-weight: 700;
   cursor: pointer;

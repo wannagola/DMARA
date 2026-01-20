@@ -8,7 +8,7 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   font-size: 1.1rem; /* Increased base font size */
   background-color: #232323;
-  border: 1px solid rgba(136, 51, 118, 0.55);
+  border: 1px solid var(--primary-color-a55);
   border-radius: 16px; /* Softer radius */
   color: #fff;
   padding: 10px; /* Add some padding */
@@ -17,7 +17,7 @@
 /* Header */
 .react-datepicker__header {
   background-color: #232323;
-  border-bottom: 1px solid rgba(136, 51, 118, 0.55);
+  border-bottom: 1px solid var(--primary-color-a55);
   padding: 20px 10px; /* Increased padding */
 }
 
@@ -56,13 +56,13 @@
 }
 
 .react-datepicker__day:hover {
-  background-color: rgba(136, 51, 118, 0.55);
+  background-color: var(--primary-color-a55);
   border-radius: 8px; /* Rounded hover effect */
 }
 
 .react-datepicker__day--selected,
 .react-datepicker__day--keyboard-selected {
-  background-color: #883376;
+  background-color: var(--primary-color);
   color: #fff;
   border-radius: 8px;
 }

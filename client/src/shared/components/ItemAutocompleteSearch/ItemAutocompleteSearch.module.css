@@ -6,7 +6,7 @@
 .input {
   box-sizing: border-box;
   width: 100%;
-  border: 1px solid #883376;
+  border: 1px solid var(--primary-color);
   background: rgba(0, 0, 0, 0.2);
   color: #fff;
   font-size: 18px; 
@@ -18,7 +18,7 @@
 }
 
 .input:focus {
-  box-shadow: 0 0 0 3px rgba(136, 51, 118, 0.3); 
+  box-shadow: 0 0 0 3px var(--primary-color-a30); 
 }
 
 .autoList {
@@ -58,7 +58,7 @@
 
 .autoItem:hover,
 .autoItemActive {
-  background: #883376;
+  background: var(--primary-color);
 }
 
 .autoThumb {
