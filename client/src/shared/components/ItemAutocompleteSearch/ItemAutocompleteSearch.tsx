@@ -53,7 +53,7 @@ export default function ItemAutocompleteSearch({
       try {
         let rawResults: any[] = [];
 
-        // 1. Talent 로직: 배우(ACTOR)와 가수(ARTIST) 구분
+        // 1. Talent 로직
         if (category === "Talent") {
           const [actorRes, idolRes] = await Promise.all([
             fetch(`http://127.0.0.1:8000/api/hobbies/search/?category=ACTOR&query=${encodeURIComponent(query)}`),
@@ -63,7 +63,6 @@ export default function ItemAutocompleteSearch({
           const actorData = await actorRes.json();
           const idolData = await idolRes.json();
           
-          // ★ 여기서 각각 "ACTOR", "ARTIST" 태그를 달아줍니다.
           const actors = (actorData.results || []).map((item: any) => ({ ...item, customType: "ACTOR" }));
           const idols = (idolData.results || []).map((item: any) => ({ ...item, customType: "ARTIST" }));
 
@@ -79,21 +78,38 @@ export default function ItemAutocompleteSearch({
           rawResults = data.results || [];
         }
         
-        // 2. 결과 포맷팅 (여기서 부제를 결정합니다)
+        // 2. 결과 포맷팅 & 부제 결정
         const formattedResults: LibraryItem[] = rawResults.map((item: any, idx: number) => {
             let title = item.title || item.name; 
             let image = item.image || item.image_url || "";
             
-            // --- 부제(Subtitle) 결정 로직 ---
+            // 기본 부제 (가수명, 날짜 등)
             let subtitle = item.subtitle || item.artist || item.date || item.time || "";
 
-            // (A) Talent인 경우: 위에서 붙인 태그 사용
+            // (A) Talent: ACTOR / ARTIST 구분
             if (category === "Talent" && item.customType) {
                 subtitle = item.customType; 
             }
-            // (B) Drama & OTT인 경우: 무조건 "DRAMA" (또는 category) 출력
+            // ★ (B) Drama & OTT: TMDB 장르 정보 사용
             else if (category === "Drama & OTT") {
-                subtitle = "DRAMA"; 
+                // 1순위: item.genre (단일 문자열)
+                if (item.genre) {
+                    subtitle = item.genre;
+                } 
+                // 2순위: item.genres (배열일 경우 콤마로 연결)
+                else if (Array.isArray(item.genres) && item.genres.length > 0) {
+                    subtitle = item.genres.join(", ");
+                }
+                // 3순위: 데이터가 아예 없으면 기본값
+                else {
+                    subtitle = "DRAMA";
+                }
+            }
+
+            // (C) Movie: 영화도 장르가 오면 보여주기 (선택 사항)
+            else if (category === "Movie") {
+                 if (item.genre) subtitle = item.genre;
+                 else if (Array.isArray(item.genres)) subtitle = item.genres.join(", ");
             }
 
             // --- 제목 예외 처리 (경기) ---
@@ -105,7 +121,7 @@ export default function ItemAutocompleteSearch({
                 id: idx,
                 category: category,
                 title: title || "No Title",
-                subtitle: subtitle, // 결정된 부제 적용
+                subtitle: subtitle, 
                 imageUrl: image,
             };
         });
