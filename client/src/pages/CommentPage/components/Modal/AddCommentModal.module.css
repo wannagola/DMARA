@@ -14,11 +14,11 @@
   width: min(900px, calc(100% - 80px));
   max-height: calc(100% - 60px);
   background: #232323;
-border: 1px solid var(--primary-color-a55);
+  border: 1px solid var(--primary-color-a55);
   box-shadow: 0 26px 80px rgba(0, 0, 0, 0.45);
   z-index: 1000;
   padding: 46px 64px 40px;
-  color: #fff;
+  color: var(--primary-color);
   display: flex;
   flex-direction: column;
 }
