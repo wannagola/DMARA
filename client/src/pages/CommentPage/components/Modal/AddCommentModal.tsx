@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./AddCommentModal.module.css";
 import CustomDatePicker from "@/shared/components/CustomDatePicker/CustomDatePicker";
-import { DateInputWithIcon } from "./DateInputWithIcon";
+import CustomDatePicker from "@/shared/components/CustomDatePicker/CustomDatePicker";
 
 type Props = {
   isOpen: boolean;
@@ -230,207 +230,209 @@ export default function AddCommentModal({
         <h2 className={styles.headline}>MY COMMENT</h2>
 
         <div className={styles.form}>
-          {/* Category */}
-          <div className={styles.row}>
-            <div className={styles.label}>Category</div>
-            <div className={styles.control}>
-              <select
-                className={styles.select}
-                value={category}
-                onChange={(e) => {
-                  setCategory(e.target.value);
-                  // ✅ 카테고리 바꾸면 자동완성 상태 초기화
-                  setIsListOpen(false);
-                  setActiveIndex(-1);
-                }}
-              >
-                {CATEGORY_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-              <span className={styles.chev} aria-hidden="true" />
-            </div>
-          </div>
-
-          {/* Title (✅ 자동완성) */}
-          <div className={styles.row}>
-            <div className={styles.label}>Title</div>
-
-            <div className={styles.control}>
-              <input
-                ref={inputRef}
-                className={styles.input}
-                value={title}
-                onChange={(e) => {
-                  setTitle(e.target.value);
-                  setIsListOpen(true);
-                  setActiveIndex(-1);
-                }}
-                onFocus={() => {
-                  setIsListOpen(true);
-                }}
-                onKeyDown={(e) => {
-                  if (!isListOpen) return;
-
-                  if (e.key === "ArrowDown") {
-                    e.preventDefault();
-                    if (filteredSuggestions.length === 0) return;
-
-                    setActiveIndex((prev) => {
-                      const next = prev + 1;
-                      return next >= filteredSuggestions.length ? 0 : next;
-                    });
-                    return;
-                  }
-
-                  if (e.key === "ArrowUp") {
-                    e.preventDefault();
-                    if (filteredSuggestions.length === 0) return;
-
-                    setActiveIndex((prev) => {
-                      const next = prev - 1;
-                      return next < 0 ? filteredSuggestions.length - 1 : next;
-                    });
-                    return;
-                  }
-
-                  if (e.key === "Enter") {
-                    if (filteredSuggestions.length === 0) return;
-
-                    // ✅ activeIndex가 없으면 0번째 선택
-                    const idx =
-                      activeIndex >= 0
-                        ? activeIndex
-                        : Math.min(0, filteredSuggestions.length - 1);
-                    const picked = filteredSuggestions[idx];
-                    if (!picked) return;
-
-                    e.preventDefault();
-                    applySuggestion(picked);
-                    return;
-                  }
-
-                  if (e.key === "Escape") {
+          <div className={styles.leftColumn}>
+            {/* Category */}
+            <div className={styles.row}>
+              <div className={styles.label}>Category</div>
+              <div className={styles.control}>
+                <select
+                  className={styles.select}
+                  value={category}
+                  onChange={(e) => {
+                    setCategory(e.target.value);
+                    // ✅ 카테고리 바꾸면 자동완성 상태 초기화
                     setIsListOpen(false);
                     setActiveIndex(-1);
-                  }
-                }}
-                placeholder=""
-                autoComplete="off"
-              />
+                  }}
+                >
+                  {CATEGORY_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+                <span className={styles.chev} aria-hidden="true" />
+              </div>
+            </div>
 
-              {/* ✅ 자동완성 리스트 */}
-              {isListOpen && filteredSuggestions.length > 0 && (
-                <div ref={listRef} className={styles.autoList} role="listbox">
-                  {filteredSuggestions.map((it, idx) => {
-                    const isActive = idx === activeIndex;
-                    return (
-                      <button
-                        key={it.id}
-                        type="button"
-                        className={`${styles.autoItem} ${
-                          isActive ? styles.autoItemActive : ""
-                        }`}
-                        onMouseEnter={() => setActiveIndex(idx)}
-                        onClick={() => applySuggestion(it)}
-                      >
-                        <img
-                          className={styles.autoThumb}
-                          src={it.imageUrl}
-                          alt={it.title}
-                        />
-                        <div className={styles.autoText}>
-                          <div className={styles.autoTitle} title={it.title}>
-                            {it.title}
+            {/* Title (✅ 자동완성) */}
+            <div className={styles.row}>
+              <div className={styles.label}>Title</div>
+
+              <div className={styles.control}>
+                <input
+                  ref={inputRef}
+                  className={styles.input}
+                  value={title}
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                    setIsListOpen(true);
+                    setActiveIndex(-1);
+                  }}
+                  onFocus={() => {
+                    setIsListOpen(true);
+                  }}
+                  onKeyDown={(e) => {
+                    if (!isListOpen) return;
+
+                    if (e.key === "ArrowDown") {
+                      e.preventDefault();
+                      if (filteredSuggestions.length === 0) return;
+
+                      setActiveIndex((prev) => {
+                        const next = prev + 1;
+                        return next >= filteredSuggestions.length ? 0 : next;
+                      });
+                      return;
+                    }
+
+                    if (e.key === "ArrowUp") {
+                      e.preventDefault();
+                      if (filteredSuggestions.length === 0) return;
+
+                      setActiveIndex((prev) => {
+                        const next = prev - 1;
+                        return next < 0 ? filteredSuggestions.length - 1 : next;
+                      });
+                      return;
+                    }
+
+                    if (e.key === "Enter") {
+                      if (filteredSuggestions.length === 0) return;
+
+                      // ✅ activeIndex가 없으면 0번째 선택
+                      const idx =
+                        activeIndex >= 0
+                          ? activeIndex
+                          : Math.min(0, filteredSuggestions.length - 1);
+                      const picked = filteredSuggestions[idx];
+                      if (!picked) return;
+
+                      e.preventDefault();
+                      applySuggestion(picked);
+                      return;
+                    }
+
+                    if (e.key === "Escape") {
+                      setIsListOpen(false);
+                      setActiveIndex(-1);
+                    }
+                  }}
+                  placeholder=""
+                  autoComplete="off"
+                />
+
+                {/* ✅ 자동완성 리스트 */}
+                {isListOpen && filteredSuggestions.length > 0 && (
+                  <div ref={listRef} className={styles.autoList} role="listbox">
+                    {filteredSuggestions.map((it, idx) => {
+                      const isActive = idx === activeIndex;
+                      return (
+                        <button
+                          key={it.id}
+                          type="button"
+                          className={`${styles.autoItem} ${
+                            isActive ? styles.autoItemActive : ""
+                          }`}
+                          onMouseEnter={() => setActiveIndex(idx)}
+                          onClick={() => applySuggestion(it)}
+                        >
+                          <img
+                            className={styles.autoThumb}
+                            src={it.imageUrl}
+                            alt={it.title}
+                          />
+                          <div className.
+                          <div className={styles.autoText}>
+                            <div className={styles.autoTitle} title={it.title}>
+                              {it.title}
+                            </div>
+                            <div className={styles.autoSub}>{it.category}</div>
                           </div>
-                          <div className={styles.autoSub}>{it.category}</div>
-                        </div>
-                        <div className={styles.autoRight}>
-                          <span className={styles.autoDate}>
-                            {`${it.date.getFullYear()}.${String(
-                              it.date.getMonth() + 1,
-                            ).padStart(
-                              2,
-                              "0",
-                            )}.${String(it.date.getDate()).padStart(2, "0")}`}
-                          </span>
-                          <span className={styles.autoChev} aria-hidden="true">
-                            ▾
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Date */}
-          <div className={styles.row}>
-            <div className={styles.label}>Date</div>
-            <div className={styles.control}>
-              <CustomDatePicker
-                selected={date}
-                onChange={(newDate: Date | null) => setDate(newDate)}
-                placeholderText="YYYY.MM.dd"
-                dateFormat="yyyy.MM.dd"
-                customInput={<DateInputWithIcon />}
-              />
-            </div>
-          </div>
-
-          {/* Comment */}
-          <div className={styles.rowComment}>
-            <div className={styles.label}>Comment</div>
-
-            <div className={styles.commentArea}>
-              <textarea
-                className={styles.textarea}
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className={styles.rowComment}>
-            <div className={styles.label}>Image</div>
-            <div className={styles.commentArea}>
-              <div className={styles.previewBox}>
-                {previewUrl ? (
-                  <img
-                    className={styles.previewImg}
-                    src={previewUrl}
-                    alt="preview"
-                  />
-                ) : (
-                  <div className={styles.previewEmpty} />
+                          <div className={styles.autoRight}>
+                            <span className={styles.autoDate}>
+                              {`${it.date.getFullYear()}.${String(
+                                it.date.getMonth() + 1,
+                              ).padStart(
+                                2,
+                                "0",
+                              )}.${String(it.date.getDate()).padStart(2, "0")}`}
+                            </span>
+                            <span
+                              className={styles.autoChev}
+                              aria-hidden="true"
+                            >
+                              ▾
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
+            </div>
 
-              <label className={styles.uploadBtn}>
-                <input
-                  className={styles.file}
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            {/* Comment */}
+            <div className={styles.rowComment}>
+              <div className={styles.label}>Comment</div>
+
+              <div className={styles.commentArea}>
+                <textarea
+                  className={styles.textarea}
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
                 />
-                Upload
-              </label>
+              </div>
+            </div>
+
+            <div className={styles.rowComment}>
+              <div className={styles.label}>Image</div>
+              <div className={styles.commentArea}>
+                <div className={styles.previewBox}>
+                  {previewUrl ? (
+                    <img
+                      className={styles.previewImg}
+                      src={previewUrl}
+                      alt="preview"
+                    />
+                  ) : (
+                    <div className={styles.previewEmpty} />
+                  )}
+                </div>
+
+                <label className={styles.uploadBtn}>
+                  <input
+                    className={styles.file}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                  />
+                  Upload
+                </label>
+              </div>
+            </div>
+
+            <div className={styles.actions}>
+              <button
+                type="button"
+                className={`${styles.saveBtn} ${
+                  !canSave ? styles.disabled : ""
+                }`}
+                onClick={handleSave}
+                disabled={!canSave}
+              >
+                UPLOAD
+              </button>
             </div>
           </div>
-
-          <div className={styles.actions}>
-            <button
-              type="button"
-              className={`${styles.saveBtn} ${!canSave ? styles.disabled : ""}`}
-              onClick={handleSave}
-              disabled={!canSave}
-            >
-              UPLOAD
-            </button>
+          <div className={styles.calendarContainer}>
+            <div className={styles.label}>Date</div>
+            <CustomDatePicker
+              selected={date}
+              onChange={(newDate: Date | null) => setDate(newDate)}
+              inline
+            />
           </div>
         </div>
       </div>

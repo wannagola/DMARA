@@ -48,18 +48,29 @@ border: 1px solid var(--primary-color-a55);
 }
 
 .form {
-  display: flex;
-  flex-direction: column;
-  gap: 26px;
+  display: grid;
+  grid-template-columns: 1fr 380px; /* Main form and calendar */
+  gap: 48px; /* Increased gap */
   overflow-y: auto;
   flex: 1;
   padding-right: 10px;
   margin-bottom: 20px;
 }
 
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  min-width: 0; /* for flexbox text overflow */
+}
+
+.calendarContainer {
+  padding-top: 10px;
+}
+
 .row {
   display: grid;
-  grid-template-columns: 180px 1fr;
+  grid-template-columns: 140px 1fr; /* smaller label */
   align-items: center;
   gap: 22px;
 }
