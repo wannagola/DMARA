@@ -96,8 +96,8 @@
 .select {
   width: 100%;
   border: none;
-  background: var(--primary-color-a20);
-  color: #fff;
+  background: transparent;
+  color: var(--primary-color);
   font-size: 26px;
   font-weight: 700;
   outline: none;
