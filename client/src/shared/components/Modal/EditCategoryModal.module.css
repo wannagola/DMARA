@@ -80,45 +80,52 @@
 .row {
   display: flex;
   align-items: center;
-  /* Remove gap from here */
-
-  background: var(--primary-color-a50); /* Theme-consistent background */
+  background: var(--primary-color-a50);
   border-radius: 22px;
-  /* Remove padding from here */
+  padding: 12px; /* Add some padding */
 }
 
-/* 좌측 썸네일 */
+.dragHandle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; /* Width for the handle */
+  height: 100%;
+  cursor: grab;
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+  margin-right: 10px;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
 .thumb {
-  width: 144px; /* Increased size */
-  height: 144px; /* Increased size */
-  border-radius: 22px; /* Match .row border-radius */
+  width: 100px;
+  height: 100px;
+  border-radius: 16px;
   object-fit: cover;
-  flex: 0 0 auto;
-  margin-left: 0;
-  margin-right: 18px; /* Space between thumb and text */
+  flex-shrink: 0;
+  margin-right: 18px;
 }
 
-/* 텍스트 영역 */
 .text {
-  flex: 1;
+  flex-grow: 1; /* Allow text to take up space */
   min-width: 0;
-  margin-left: 0;
-  margin-right: 0; /* Space between text and remove button */
 }
 
-/* 우측 삭제 버튼(−) */
 .removeBtn {
-  width: 110px;
-  height: 110px;
-  border-radius: 26px;
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
   border: none;
   background: rgba(255, 255, 255, 0.14);
   color: #fff;
-  font-size: 58px;
+  font-size: 40px;
   cursor: pointer;
-  flex: 0 0 auto;
-  margin-left: 0; /* Align to left edge */
-  margin-right: 18px; /* Space between remove button and thumb */
+  flex-shrink: 0;
+  margin-left: 10px;
 }
 
 /* ===== Add Button ===== */
