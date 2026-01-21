@@ -113,6 +113,22 @@ export default function OnboardingPage() {
       console.error(e);
     }
   };
+
+  const handleOrderChange = (orderedCategoryItems: CategoryItem[]) => {
+    if (!openCategory) return;
+
+    // Find all items that were part of the original category view
+    const originalCategoryItems = getItemsByCategory(openCategory);
+    const originalCategoryItemIds = new Set(originalCategoryItems.map(item => item.id));
+    
+    // Start with items that are NOT in the category we're editing
+    const otherItems = allItems.filter(item => !originalCategoryItemIds.has(item.id));
+    
+    // Add the newly ordered items
+    const newAllItems = [...otherItems, ...orderedCategoryItems];
+    
+    setAllItems(newAllItems);
+  };
   
   const saveNickname = async () => {
     const token = localStorage.getItem("userToken");
@@ -281,6 +297,7 @@ export default function OnboardingPage() {
           isOpen={true} category={openCategory} items={getItemsByCategory(openCategory)}
           onClose={closeCategoryModal} onRemove={(id) => removeItemFromCategory(id)}
           onAddItem={(item) => addItemToCategory(openCategory, item)}
+          onOrderChange={handleOrderChange}
         />
       )}
       <Modal isOpen={isColorModalOpen} onClose={() => setIsColorModalOpen(false)} title="Select Theme Color">
