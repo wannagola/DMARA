@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -32,3 +33,18 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
+class Notification(models.Model):
+    TYPE_CHOICES = (
+        ('follow', 'Follow'),
+        ('like', 'Like'),
+    )
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_notifications')
+    notification_type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    related_id = models.IntegerField(null=True, blank=True) # 좋아요 눌린 글 ID 등
+    is_read = models.BooleanField(default=False) # 읽음 여부
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']

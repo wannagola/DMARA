@@ -1,45 +1,171 @@
 .page {
   min-height: 100vh;
   background: #1e1e1e;
-  padding: 28px 28px 80px;
+  padding: 80px 20px;
   color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+/* --- 검색창 스타일 --- */
+.searchContainer {
+  position: relative; /* ✅ 드롭다운의 기준점 */
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 650px; /* 길이 조금 더 늘림 */
+  height: 64px;     /* 높이도 조금 더 시원하게 */
+  border: 2px solid var(--primary-color);
+  border-radius: 50px;
+  background-color: #1e1e1e; /* 배경색 지정 (드롭다운과 겹칠 때 대비) */
+  padding: 0 28px;
+  margin-bottom: 60px;
+  transition: box-shadow 0.2s ease, border-radius 0.2s ease;
+  z-index: 100; /* 다른 요소보다 위에 오도록 */
+}
+
+/* 검색 중일 때(드롭다운 열림) 아래쪽 모서리를 각지게 변경하고 싶다면 사용 */
+.searchContainer.active {
+  border-radius: 24px 24px 0 0;
+  border-bottom: 1px solid #333;
+}
+
+.searchContainer:focus-within {
+  box-shadow: 0 0 15px var(--primary-color-a50);
+}
+
+/* ✅ 로고 크기 확대 */
+.searchLogo {
+  width: 36px;  /* 기존 24px -> 36px */
+  height: 36px;
+  margin-right: 16px;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-size: 20px; /* 폰트도 살짝 키움 */
+  color: #fff;
+  outline: none;
+  font-weight: 500;
+}
+
+.searchInput::placeholder {
+  color: #666;
+}
+
+.searchButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.searchIcon {
+  width: 28px;
+  height: 28px;
+  stroke: var(--primary-color);
+  stroke-width: 3;
+  transition: transform 0.2s;
+}
+
+.searchButton:hover .searchIcon {
+  transform: scale(1.1);
+}
+
+/* --- ✅ 자동완성 드롭다운 (Dropdown) --- */
+.dropdownList {
+  position: absolute;
+  top: 100%; /* 검색창 바로 아래 */
+  left: 0;
+  width: 100%;
+  background-color: #2a2a2a;
+  border: 2px solid var(--primary-color);
+  border-top: none; /* 위쪽 선 제거 (검색창과 이어지게) */
+  border-radius: 0 0 24px 24px;
+  padding: 10px 0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  z-index: 99;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdownItem:hover {
+  background-color: var(--primary-color-a20);
+}
+
+.dropdownAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 16px;
+  border: 1px solid #555;
+}
+
+.dropdownUsername {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.noResult {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+}
+
+/* --- 기존 통계 스타일 --- */
+.title {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
 .statsContainer {
   display: flex;
-  gap: 80px;
-  margin: 40px 0; /* Also increase vertical margin for better spacing */
+  gap: 100px;
+  margin-bottom: 60px;
 }
 
 .stat {
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: 36px;
-  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.stat:hover {
+  transform: scale(1.1);
 }
 
 .count {
-  font-size: 64px;
+  font-size: 72px;
   font-weight: 900;
   color: var(--primary-color);
+  margin-bottom: 8px;
+  line-height: 1;
 }
 
-.buttonsContainer {
-  display: flex;
-  gap: 20px;
-}
-
-.button {
-  background: var(--primary-color-a20);
-  border: 1px solid var(--primary-color-a55);
-  color: #fff;
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-size: 18px;
-  font-weight: 800;
-  cursor: pointer;
+.stat span:last-child {
+  font-size: 20px;
+  color: #ccc;
+  font-weight: 600;
 }
