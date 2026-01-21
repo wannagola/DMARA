@@ -1,20 +1,22 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./AddCommentModal.module.css";
 import CustomDatePicker from "@/shared/components/CustomDatePicker/CustomDatePicker";
+import BACKEND_URL from "@/config";
 
 export type NewCommentPayload = {
   category: string;
   title: string;
   date: Date;
   comment: string;
+  posterUrl: string;
   imagePreviewUrl: string | null;
+  file: File | null; // ✅ 서버 전송용 파일 객체 추가
 };
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (payload: NewCommentPayload) => void;
-  // Controlled component props
   category: string;
   setCategory: (value: string) => void;
   title: string;
@@ -38,6 +40,17 @@ const CATEGORY_OPTIONS = [
   "Shows",
 ];
 
+const BACKEND_CATEGORY_MAP: Record<string, string> = {
+  "Exhibitions & Shows": "EXHIBITION",
+  Movie: "MOVIE",
+  Music: "MUSIC",
+  Sports: "SPORTS",
+  Talent: "ACTOR",
+  Matches: "MATCH",
+  TV: "DRAMA",
+  Shows: "EXHIBITION",
+};
+
 export default function AddCommentModal({
   isOpen,
   onClose,
@@ -53,19 +66,88 @@ export default function AddCommentModal({
   file,
   setFile,
 }: Props) {
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [isListOpen, setIsListOpen] = useState(false);
+  const [selectedPoster, setSelectedPoster] = useState("");
+  const listRef = useRef<HTMLDivElement>(null);
+
   const previewUrl = useMemo(() => {
     if (!file) return null;
     return URL.createObjectURL(file);
   }, [file]);
 
   useEffect(() => {
-    // Cleanup object URL when component unmounts or file changes
     return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
+
+  // 검색 로직
+  useEffect(() => {
+    const fetchSearch = async () => {
+      const query = title.trim();
+      if (!query) {
+        setSuggestions([]);
+        return;
+      }
+      if (suggestions.find((s) => s.title === title)) return;
+
+      const backendCategory = BACKEND_CATEGORY_MAP[category] || "ETC";
+      try {
+        const res = await fetch(
+          `${BACKEND_URL}/api/hobbies/search/?category=${backendCategory}&query=${encodeURIComponent(
+            query
+          )}`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setSuggestions(
+            (data.results || []).map((item: any) => ({
+              title: item.title || item.name,
+              subtitle: item.subtitle || item.artist || item.genre || "",
+              date: item.date || item.release_date || item.first_air_date,
+              imageUrl: item.image_url || item.image || "",
+            }))
+          );
+          setIsListOpen(true);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    const debounce = setTimeout(fetchSearch, 300);
+    return () => clearTimeout(debounce);
+  }, [title, category]);
+
+  const handleSelect = (item: any) => {
+    setTitle(item.title);
+    setSelectedPoster(item.imageUrl);
+    if (item.date) {
+      const parsedDate = new Date(item.date);
+      if (!isNaN(parsedDate.getTime())) setDate(parsedDate);
+    }
+    setIsListOpen(false);
+  };
+
+  const handleSave = () => {
+    if (!category || !title || !date || !comment) return;
+    onSubmit({
+      category,
+      title: title.trim(),
+      date,
+      comment: comment.trim(),
+      posterUrl: selectedPoster,
+      imagePreviewUrl: previewUrl,
+      file: file, // ✅ 파일 객체 전달
+    });
+    setSelectedPoster("");
+    setSuggestions([]);
+  };
+
+  useEffect(() => {
+    if (!isOpen) setIsListOpen(false);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -75,35 +157,14 @@ export default function AddCommentModal({
     date !== null &&
     comment.trim().length > 0;
 
-  const handleSave = () => {
-    if (!canSave || !date) return;
-
-    onSubmit({
-      category,
-      title: title.trim(),
-      date,
-      comment: comment.trim(),
-      imagePreviewUrl: previewUrl,
-    });
-  };
-
   return (
     <>
-      {/* 배경 블러/딤 */}
       <div className={styles.overlay} onClick={onClose} />
-
       <div className={styles.modal} role="dialog" aria-modal="true">
-        <button
-          type="button"
-          className={styles.close}
-          onClick={onClose}
-          aria-label="close"
-        >
+        <button className={styles.close} onClick={onClose}>
           ×
         </button>
-
         <h2 className={styles.headline}>MY COMMENT</h2>
-
         <div className={styles.form}>
           {/* Category */}
           <div className={styles.row}>
@@ -112,7 +173,11 @@ export default function AddCommentModal({
               <select
                 className={styles.select}
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => {
+                  setCategory(e.target.value);
+                  setTitle("");
+                  setSuggestions([]);
+                }}
               >
                 {CATEGORY_OPTIONS.map((opt) => (
                   <option key={opt} value={opt}>
@@ -123,20 +188,68 @@ export default function AddCommentModal({
               <span className={styles.chev} aria-hidden="true" />
             </div>
           </div>
-
           {/* Title */}
           <div className={styles.row}>
             <div className={styles.label}>Title</div>
-            <div className={styles.control}>
+            <div className={styles.control} style={{ position: "relative" }}>
               <input
                 className={styles.input}
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder=""
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  setIsListOpen(true);
+                }}
+                placeholder="Search title..."
+                autoComplete="off"
               />
+              {isListOpen && suggestions.length > 0 && (
+                <div
+                  ref={listRef}
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    width: "100%",
+                    maxHeight: "200px",
+                    overflowY: "auto",
+                    background: "#333",
+                    border: "1px solid #555",
+                    borderRadius: "0 0 8px 8px",
+                    zIndex: 10,
+                  }}
+                >
+                  {suggestions.map((it, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => handleSelect(it)}
+                      style={{
+                        padding: "10px",
+                        borderBottom: "1px solid #444",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "#444")}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                    >
+                      {it.imageUrl && (
+                        <img
+                          src={it.imageUrl}
+                          alt=""
+                          style={{ width: "30px", height: "40px", objectFit: "cover" }}
+                        />
+                      )}
+                      <div>
+                        <div style={{ fontWeight: "bold", fontSize: "14px" }}>{it.title}</div>
+                        <div style={{ fontSize: "12px", color: "#aaa" }}>{it.subtitle}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-
           {/* Date */}
           <div className={styles.row}>
             <div className={styles.label}>Date</div>
@@ -151,11 +264,9 @@ export default function AddCommentModal({
               <span className={styles.calendarIcon} aria-hidden="true" />
             </div>
           </div>
-
           {/* Comment */}
           <div className={styles.rowComment}>
             <div className={styles.label}>Comment</div>
-
             <div className={styles.commentArea}>
               <textarea
                 className={styles.textarea}
@@ -164,22 +275,17 @@ export default function AddCommentModal({
               />
             </div>
           </div>
-
+          {/* Image */}
           <div className={styles.rowComment}>
             <div className={styles.label}>Image</div>
             <div className={styles.commentArea}>
               <div className={styles.previewBox}>
                 {previewUrl ? (
-                  <img
-                    className={styles.previewImg}
-                    src={previewUrl}
-                    alt="preview"
-                  />
+                  <img className={styles.previewImg} src={previewUrl} alt="preview" />
                 ) : (
                   <div className={styles.previewEmpty} />
                 )}
               </div>
-
               <label className={styles.uploadBtn}>
                 <input
                   className={styles.file}
@@ -191,7 +297,6 @@ export default function AddCommentModal({
               </label>
             </div>
           </div>
-
           <div className={styles.actions}>
             <button
               type="button"

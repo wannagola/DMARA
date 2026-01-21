@@ -1,200 +1,228 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CommentPage.module.css";
 import AddCommentModal, {
   type NewCommentPayload,
-} from "@/pages/CommentPage/components/Modal/AddCommentModal.tsx";
+} from "@/pages/CommentPage/components/Modal/AddCommentModal";
+import BACKEND_URL from "@/config";
 
 export type CommentItem = {
   id: number;
   category: string;
   title: string;
-  date: string; // YYYY.MM.DD
+  date: string;
   contentPreview: string;
-  imageUrl: string;
+  posterUrl: string;
+  userImageUrl: string | null;
   likes: number;
+  isOwner: boolean;
 };
 
-const initialItems: CommentItem[] = [
-  {
-    id: 1,
-    category: "Exhibitions & Shows",
-    title: "Wicked",
-    date: "2026.01.16",
-    contentPreview:
-      "오늘 뮤지컬 Wicked를 보고 왔다. 생각보다 내용이 무거워서 조금 놀랐다. 엘파바가 단순히 나쁜 ...",
-    imageUrl: "/src/assets/items/wicked.png",
-    likes: 57,
-  },
-  {
-    id: 3,
-    category: "Movie",
-    title: "Interstellar",
-    date: "2026.01.16", // Same date as Wicked
-    contentPreview:
-      "인생 최고의 영화, OST만 들어도 가슴이 웅장해진다. 우주를 표현하는 방법이...",
-    imageUrl: "/src/assets/items/interstellar.png",
-    likes: 120,
-  },
-  {
-    id: 4,
-    category: "Music",
-    title: "Dynamite",
-    date: "2026.01.16", // Same date as Wicked
-    contentPreview:
-      "신나는 음악! BTS는 역시 최고다. 스트레스가 확 풀리는 느낌!",
-    imageUrl: "/src/assets/items/dynamite.png",
-    likes: 200,
-  },
-  {
-    id: 2,
-    category: "Exhibitions & Shows",
-    title: "DEADLINE : WORLD TOUR",
-    date: "2025.07.05",
-    contentPreview:
-      "오늘은 바로 기다리고 기다리던 콘서트를 다녀온 날이다! 아침 일찍부터 준비를 하고 셔틀버스를...",
-    imageUrl: "/src/assets/items/deadline.png",
-    likes: 33,
-  },
-  {
-    id: 5,
-    category: "Sports",
-    title: "UEFA Champions League Final",
-    date: "2026.01.20",
-    contentPreview:
-      "역대급 경기가 펼쳐졌다! 메시의 드리블은 역시 신계의 움직임이었다.",
-    imageUrl: "/src/assets/items/champions_league.png",
-    likes: 88,
-  },
-  {
-    id: 6,
-    category: "Movie",
-    title: "Avatar 2",
-    date: "2026.01.20",
-    contentPreview:
-      "황홀한 영상미에 넋을 잃었다. 3D로 보니 더욱 실감나고 스토리가 탄탄하다.",
-    imageUrl: "/src/assets/items/avatar2.png",
-    likes: 150,
-  },
-];
-
-type TabKey = "MY" | "FRIENDS";
+// ✅ [추가] 프론트엔드 카테고리 -> 백엔드 코드로 변환하는 지도
+const TO_BACKEND_CATEGORY: Record<string, string> = {
+  "Exhibitions & Shows": "SHOW",
+  "Movie": "MOVIE",
+  "Music": "MUSIC",
+  "Sports": "SPORTS",
+  "Talent": "ACTOR",
+  "Matches": "MATCH",
+  "TV": "DRAMA",
+  "Shows": "SHOW", // Shows도 전시/공연으로 처리
+  "Etc": "ETC"
+};
 
 export default function CommentPage() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<TabKey>("MY");
-
-  const [items, setItems] = useState<CommentItem[]>(initialItems);
+  const [tab, setTab] = useState<"MY" | "FRIENDS">("MY");
+  
+  const [items, setItems] = useState<CommentItem[]>([]);
   const [likedIds, setLikedIds] = useState(new Set<number>());
-
   const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
 
-  // Add modal state
-
+  // Modal State
   const [isAddOpen, setIsAddOpen] = useState(false);
-
   const [category, setCategory] = useState("Exhibitions & Shows");
-
   const [title, setTitle] = useState("");
-
   const [date, setDate] = useState<Date | null>(null);
-
   const [comment, setComment] = useState("");
-
   const [file, setFile] = useState<File | null>(null);
 
-  const visibleItems = useMemo(() => {
-    return items;
-  }, [items]);
+  // --- 1. DB에서 코멘트 목록 불러오기 ---
+  useEffect(() => {
+    const fetchComments = async () => {
+      const token = localStorage.getItem("userToken");
+      if (!token) return;
 
-  const handleLikeToggle = (e: React.MouseEvent, id: number) => {
-    e.stopPropagation(); // Prevent navigation
-    const newLikedIds = new Set(likedIds);
-    const isLiked = likedIds.has(id);
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/posts/`, {
+          headers: { Authorization: `Token ${token}` },
+        });
 
-    if (isLiked) {
-      newLikedIds.delete(id);
-    } else {
-      newLikedIds.add(id);
-    }
-    setLikedIds(newLikedIds);
-
-    // Also update the master items array
-    setItems((prevItems) =>
-      prevItems.map((item) => {
-        if (item.id === id) {
-          return { ...item, likes: item.likes + (isLiked ? -1 : 1) };
+        if (res.ok) {
+          const data = await res.json();
+          const loadedItems = data.map((it: any) => ({
+            id: it.id,
+            // 백엔드 코드(EXHIBITION)가 오면 그냥 보여주거나, 필요하면 다시 한글로 변환 가능
+            category: it.category, 
+            title: it.title,
+            date: it.date_str || it.date,
+            contentPreview: it.content,
+            posterUrl: it.poster_url || "",
+            userImageUrl: it.user_image || null,
+            likes: it.likes_count || 0,
+            isOwner: it.is_owner,
+          }));
+          setItems(loadedItems);
         }
-        return item;
-      })
+      } catch (e) {
+        console.error("Failed to load comments:", e);
+      }
+    };
+    fetchComments();
+  }, []);
+
+  // --- 2. 탭 필터링 ---
+  const visibleItems = useMemo(() => {
+    if (tab === "MY") {
+      return items.filter((it) => it.isOwner);
+    } else {
+      return items.filter((it) => !it.isOwner);
+    }
+  }, [items, tab]);
+
+  const handleLikeToggle = async (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    
+    // UI 즉시 반영 (Optimistic Update)
+    const isLiked = likedIds.has(id);
+    const newLikedIds = new Set(likedIds);
+    if (isLiked) newLikedIds.delete(id);
+    else newLikedIds.add(id);
+    setLikedIds(newLikedIds);
+    
+    setItems((prev) =>
+      prev.map((it) =>
+        it.id === id ? { ...it, likes: it.likes + (isLiked ? -1 : 1) } : it
+      )
     );
+
+    // 서버에 좋아요 요청 전송
+    const token = localStorage.getItem("userToken");
+    if (token) {
+      try {
+        await fetch(`${BACKEND_URL}/api/posts/${id}/like/`, {
+            method: "POST",
+            headers: { Authorization: `Token ${token}` },
+        });
+      } catch(err) { console.error(err); }
+    }
   };
 
   const toggleMenu = (e: React.MouseEvent, id: number) => {
-    e.stopPropagation(); // Prevent navigation when clicking the button
+    e.stopPropagation();
     setMenuOpenId((prev) => (prev === id ? null : id));
   };
 
-  const deleteItem = (e: React.MouseEvent, id: number) => {
+  const deleteItem = async (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
-    setItems((prev) => prev.filter((it) => it.id !== id));
+    if (!confirm("Are you sure you want to delete?")) return;
+
+    const token = localStorage.getItem("userToken");
+    try {
+        const res = await fetch(`${BACKEND_URL}/api/posts/${id}/`, {
+            method: "DELETE",
+            headers: { Authorization: `Token ${token}` },
+        });
+        if(res.ok) {
+            setItems((prev) => prev.filter((it) => it.id !== id));
+        } else {
+            alert("삭제 실패");
+        }
+    } catch(e) {
+        console.error(e);
+    }
     setMenuOpenId(null);
   };
 
   const openAdd = () => {
     setMenuOpenId(null);
-
-    // Reset form state
-
     setCategory("Exhibitions & Shows");
-
     setTitle("");
-
     setDate(null);
-
     setComment("");
-
     setFile(null);
-
     setIsAddOpen(true);
   };
 
   const closeAdd = () => setIsAddOpen(false);
 
-  const handleAddSubmit = (payload: NewCommentPayload) => {
-    const nextId = (items[0]?.id ?? 0) + 1;
+  // --- 3. 코멘트 업로드 ---
+  const handleAddSubmit = async (payload: NewCommentPayload) => {
+    const token = localStorage.getItem("userToken");
+    if (!token) {
+        alert("로그인이 필요합니다.");
+        return;
+    }
 
     const yyyy = payload.date.getFullYear();
-
     const mm = String(payload.date.getMonth() + 1).padStart(2, "0");
-
     const dd = String(payload.date.getDate()).padStart(2, "0");
+    const dateStr = `${yyyy}-${mm}-${dd}`;
 
-    const newItem: CommentItem = {
-      id: nextId,
+    // ✅ [핵심 수정] 카테고리 변환 (Exhibitions & Shows -> EXHIBITION)
+    // 매핑에 없으면 기본값 ETC
+    const backendCategory = TO_BACKEND_CATEGORY[payload.category] || "ETC";
 
-      category: payload.category,
+    const formData = new FormData();
+    formData.append("category", backendCategory); // 변환된 값 전송
+    formData.append("title", payload.title);
+    formData.append("date", dateStr);
+    formData.append("content", payload.comment);
+    
+    // ✅ [안전 장치] 빈 문자열("")이면 보내지 않음 (URLField 에러 방지)
+    if (payload.posterUrl) {
+        formData.append("poster_url", payload.posterUrl);
+    }
+    
+    if (payload.file) {
+        formData.append("user_image", payload.file);
+    }
 
-      title: payload.title,
+    try {
+        const res = await fetch(`${BACKEND_URL}/api/posts/`, {
+            method: "POST",
+            headers: { Authorization: `Token ${token}` },
+            body: formData,
+        });
 
-      date: `${yyyy}.${mm}.${dd}`,
-
-      contentPreview: payload.comment,
-
-      imageUrl: payload.imagePreviewUrl ?? "/src/assets/items/placeholder.png",
-
-      likes: 0,
-    };
-
-    setItems((prev) => [newItem, ...prev]);
-
-    closeAdd();
+        if (res.ok) {
+            const newServerItem = await res.json();
+            const newItem: CommentItem = {
+                id: newServerItem.id,
+                category: newServerItem.category,
+                title: newServerItem.title,
+                date: newServerItem.date_str || dateStr.replace(/-/g, '.'),
+                contentPreview: newServerItem.content,
+                posterUrl: newServerItem.poster_url,
+                userImageUrl: newServerItem.user_image,
+                likes: 0,
+                isOwner: true,
+            };
+            setItems((prev) => [newItem, ...prev]);
+            closeAdd();
+        } else {
+            const errData = await res.json();
+            console.error("Upload failed", errData);
+            alert(`업로드 실패: ${JSON.stringify(errData)}`);
+        }
+    } catch (e) {
+        console.error("Network error", e);
+        alert("네트워크 오류가 발생했습니다.");
+    }
   };
 
   return (
     <div className={styles.page}>
-      {/* sub tab bar */}
-
       <div className={styles.subTabWrap}>
         <button
           type="button"
@@ -203,12 +231,9 @@ export default function CommentPage() {
         >
           My Comment
         </button>
-
         <button
           type="button"
-          className={`${styles.subTab} ${
-            tab === "FRIENDS" ? styles.active : ""
-          }`}
+          className={`${styles.subTab} ${tab === "FRIENDS" ? styles.active : ""}`}
           onClick={() => setTab("FRIENDS")}
         >
           Friends
@@ -216,6 +241,13 @@ export default function CommentPage() {
       </div>
 
       <div className={styles.list}>
+        {visibleItems.length === 0 && (
+          <div style={{ textAlign: "center", padding: "40px", color: "#888" }}>
+            {tab === "MY" 
+                ? "아직 작성한 코멘트가 없습니다." 
+                : "친구들의 코멘트가 없습니다."}
+          </div>
+        )}
         {visibleItems.map((it) => {
           const isLiked = likedIds.has(it.id);
           return (
@@ -224,19 +256,19 @@ export default function CommentPage() {
               className={styles.card}
               onClick={() => navigate(`/comment/${it.id}`)}
             >
+              {/* 포스터 이미지 (없으면 숨김) */}
               <img
                 className={styles.poster}
-                src={it.imageUrl}
+                src={it.posterUrl || "/src/assets/items/placeholder.png"}
                 alt={it.title}
+                onError={(e) => (e.currentTarget.style.display = 'none')}
               />
 
               <div className={styles.content}>
                 <div className={styles.topRow}>
                   <div className={styles.meta}>
                     <div className={styles.category}>{it.category}</div>
-
                     <div className={styles.title}>{it.title}</div>
-
                     <div className={styles.date}>{it.date}</div>
                   </div>
 
@@ -245,11 +277,9 @@ export default function CommentPage() {
                       type="button"
                       className={styles.moreBtn}
                       onClick={(e) => toggleMenu(e, it.id)}
-                      aria-label="more"
                     >
                       •••
                     </button>
-
                     {menuOpenId === it.id && (
                       <button
                         type="button"
@@ -262,6 +292,22 @@ export default function CommentPage() {
                   </div>
                 </div>
 
+                {/* 유저가 올린 직찍 */}
+                {it.userImageUrl && (
+                  <div style={{ marginTop: "16px", marginBottom: "8px" }}>
+                    <img
+                      src={it.userImageUrl}
+                      alt="User Upload"
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: "300px",
+                        borderRadius: "12px",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </div>
+                )}
+
                 <p className={styles.preview}>{it.contentPreview}</p>
               </div>
 
@@ -269,10 +315,7 @@ export default function CommentPage() {
                 className={styles.likeBox}
                 onClick={(e) => handleLikeToggle(e, it.id)}
               >
-                <button
-                  className={styles.heartButton}
-                  aria-label="Like"
-                >
+                <button className={styles.heartButton}>
                   <svg
                     className={`${styles.heart} ${isLiked ? styles.liked : ""}`}
                     viewBox="0 0 24 24"
@@ -287,8 +330,6 @@ export default function CommentPage() {
         })}
       </div>
 
-      {/* floating add */}
-
       <button type="button" className={styles.fab} onClick={openAdd}>
         Add
       </button>
@@ -296,8 +337,6 @@ export default function CommentPage() {
       <footer className={styles.footer}>
         © 2026 D_MARA. All Rights Reserved.
       </footer>
-
-      {/* Add modal (레퍼런스 스타일) */}
 
       <AddCommentModal
         isOpen={isAddOpen}

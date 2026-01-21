@@ -5,14 +5,14 @@ from django.dispatch import receiver
 
 User = get_user_model()
 
-# 카테고리 (MATCH 다시 추가!)
+# 카테고리
 CATEGORY_CHOICES = [
     ('MUSIC', 'Music'),
     ('IDOL', 'Idol'),
     ('MOVIE', 'Movie'),
     ('DRAMA', 'Drama'),
     ('SPORTS', 'Sports (Team)'),
-    ('MATCH', 'Match Schedule'), # ★ 경기 일정 복구
+    ('MATCH', 'Match Schedule'),
     ('ACTOR', 'Actor'),
     ('EXHIBITION', 'Exhibitions & Shows'),
     ('FOOD', 'Food'),
@@ -35,7 +35,7 @@ def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
 
-# 2. 관심사 아이템 (Who am I 하단 박제용 - NewJeans, 맨시티 등)
+# 2. 관심사 아이템 (Who am I 하단 박제용)
 class HobbyItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='hobbies')
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
@@ -46,27 +46,3 @@ class HobbyItem(models.Model):
 
     def __str__(self):
         return f"{self.user} likes {self.title}"
-
-# 3. 게시글 (Comment 탭 - 일기 & 경기 기록)
-class Post(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
-    
-    title = models.CharField(max_length=200)       # 제목 / 매치업
-    date = models.DateField()                      # 날짜
-    content = models.TextField(blank=True)         # 내용
-    image_url = models.URLField(blank=True, null=True) 
-    
-    # 경기(MATCH) 기록 전용 필드
-    home_team = models.CharField(max_length=100, blank=True, null=True)
-    away_team = models.CharField(max_length=100, blank=True, null=True)
-    home_score = models.IntegerField(blank=True, null=True)
-    away_score = models.IntegerField(blank=True, null=True)
-    my_status = models.CharField(max_length=20, blank=True, null=True) # WIN, LOSE, DRAW
-
-    # 좋아요
-    likes = models.ManyToManyField(User, related_name='liked_posts', blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.title} - {self.user}"

@@ -195,3 +195,6 @@ CSRF_TRUSTED_ORIGINS = [
     'http://54.180.118.183.nip.io:5173',   # 서버 프론트엔드 (nip.io)
     'http://54.180.118.183:5173',          # (혹시 몰라 IP도 추가)
 ]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
