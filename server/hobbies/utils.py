@@ -180,8 +180,6 @@ def search_sports(query):
         base_url = f"https://{host}"
         try:
             params = {"search": query}
-            if sport_name == "Formula 1":
-                params = {"name": query} 
             
             full_url = base_url + team_endpoint
             res = requests.get(full_url, headers=SPORTS_HEADERS, params=params)

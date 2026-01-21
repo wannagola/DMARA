@@ -9,15 +9,23 @@ type WhoAmIDisplayProps = {
   username: string;
   iam: string;
   profileImageUrl: string;
+  isMyPage: boolean;
   musicItems: CategoryItem[];
   movieItems: CategoryItem[];
   talentItems: CategoryItem[];
   sportsItems: CategoryItem[];
-  matchesItems: CategoryItem[];
   dramaItems: CategoryItem[];
   showsItems: CategoryItem[];
   isCapturing?: boolean;
 };
+
+async function fetchFollowingList(token: string) {
+  const res = await fetch(`${BACKEND_URL}/api/users/following/`, {
+    headers: { 'Authorization': `Token ${token}` },
+  });
+  if (!res.ok) throw new Error('Failed to fetch following list');
+  return res.json();
+}
 
 async function toggleFollow(userId: string, token: string) {
   const res = await fetch(`${BACKEND_URL}/api/users/${userId}/follow/`, {
@@ -28,58 +36,41 @@ async function toggleFollow(userId: string, token: string) {
   return res.json();
 }
 
-async function fetchFollowingList(token: string) {
-  const res = await fetch(`${BACKEND_URL}/api/users/following/`, {
-    headers: { 'Authorization': `Token ${token}` },
-  });
-  if (!res.ok) throw new Error('Failed to fetch following list');
-  return res.json();
-}
-
 export default function WhoAmIDisplay({
   username,
   iam,
   profileImageUrl,
+  isMyPage,
   musicItems,
   movieItems,
   talentItems,
   sportsItems,
-  matchesItems,
   dramaItems,
   showsItems,
   isCapturing,
 }: WhoAmIDisplayProps) {
   const { userId } = useParams<{ userId: string }>();
   const [isFollowing, setIsFollowing] = useState(false);
-  const [isMyPage, setIsMyPage] = useState(true);
   
   useEffect(() => {
     const token = localStorage.getItem("userToken");
-    if (!token || !userId) {
-      setIsMyPage(true);
-      return;
-    }
+    if (!token || isMyPage || !userId) return;
 
-    // Need to get current user's ID to check if this is my page
-    fetch(`${BACKEND_URL}/dj-rest-auth/user/`, {
-      headers: { "Authorization": `Token ${token}` },
-    }).then(res => res.json()).then(data => {
-      if (data.pk.toString() === userId) {
-        setIsMyPage(true);
-      } else {
-        setIsMyPage(false);
-        // Check follow status only if it's not my page
-        fetchFollowingList(token).then(followingList => {
-          const isFollowingUser = followingList.some((user: any) => user.id.toString() === userId);
-          setIsFollowing(isFollowingUser);
-        });
-      }
-    });
-  }, [userId]);
+    fetchFollowingList(token).then(followingList => {
+      const isFollowingUser = followingList.some((user: any) => user.id.toString() === userId);
+      setIsFollowing(isFollowingUser);
+    }).catch(err => console.error(err));
+  }, [userId, isMyPage]);
   
   const handleFollow = async () => {
     const token = localStorage.getItem("userToken");
     if (!token || !userId) return;
+
+    const action = isFollowing ? "언팔로우(Unfollow)" : "팔로우(Follow)";
+    if (!window.confirm(`정말 ${action} 하시겠습니까?`)) {
+      return;
+    }
+
     try {
       await toggleFollow(userId, token);
       setIsFollowing(prev => !prev);
@@ -89,27 +80,18 @@ export default function WhoAmIDisplay({
   };
 
   const iamDisplay = useMemo(() => {
-    return iam.trim().length > 0 ? iam : "";
+    return iam && iam.trim().length > 0 ? iam : "";
   }, [iam]);
 
   const getItemsByCategory = (category: string): CategoryItem[] => {
     switch (category) {
-      case "Music":
-        return musicItems;
-      case "Movie":
-        return movieItems;
-      case "Talent":
-        return talentItems;
-      case "Sports":
-        return sportsItems;
-      case "Matches":
-        return matchesItems;
-      case "Drama & OTT":
-        return dramaItems;
-      case "Shows":
-        return showsItems;
-      default:
-        return [];
+      case "Music": return musicItems;
+      case "Movie": return movieItems;
+      case "Talent": return talentItems;
+      case "Sports": return sportsItems;
+      case "Drama & OTT": return dramaItems;
+      case "Shows": return showsItems;
+      default: return [];
     }
   };
 
@@ -117,11 +99,17 @@ export default function WhoAmIDisplay({
     <div className={styles.page}>
       <section className={`${styles.section} ${styles.profileSection}`}>
         <div className={styles.profileAvatar}>
-          <img src={profileImageUrl} alt="Profile" />
+          {/* ✅ [추가] crossOrigin="anonymous" 속성 추가 */}
+          <img 
+            src={profileImageUrl} 
+            alt="Profile" 
+            crossOrigin="anonymous" 
+          />
         </div>
         <div className={styles.profileInfo}>
           <h1 className={styles.profileUsername}>{username}</h1>
           {iamDisplay && <p className={styles.profileIntro}>{iamDisplay}</p>}
+          
           {!isMyPage && (
             <button onClick={handleFollow} className={styles.followButton}>
               {isFollowing ? 'Unfollow' : 'Follow'}
@@ -130,7 +118,7 @@ export default function WhoAmIDisplay({
         </div>
       </section>
 
-      {CATEGORIES.map((category) => {
+      {CATEGORIES.filter(category => category !== "Matches").map((category) => {
         const items = getItemsByCategory(category);
         return (
           <section key={category} className={styles.section}>
@@ -143,10 +131,12 @@ export default function WhoAmIDisplay({
                     className={styles.itemCard}
                     data-is-capturing={isCapturing}
                   >
+                    {/* ✅ [추가] crossOrigin="anonymous" 속성 추가 */}
                     <img
                       className={styles.thumb}
                       src={item.imageUrl}
                       alt={item.title}
+                      crossOrigin="anonymous"
                     />
                     <div className={styles.info}>
                       <div className={styles.title}>{item.title}</div>
@@ -156,7 +146,7 @@ export default function WhoAmIDisplay({
                 ))
               ) : (
                 <div className={styles.emptyState}>
-                  표시할 {category} 아이템이 없습니다.
+                  Empty
                 </div>
               )}
             </div>

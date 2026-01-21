@@ -16,9 +16,10 @@ export type CommentItem = {
   userImageUrl: string | null;
   likes: number;
   isOwner: boolean;
+  isLiked: boolean;
+  nickname: string;
 };
 
-// ✅ [추가] 프론트엔드 카테고리 -> 백엔드 코드로 변환하는 지도
 const TO_BACKEND_CATEGORY: Record<string, string> = {
   "Exhibitions & Shows": "SHOW",
   "Movie": "MOVIE",
@@ -27,7 +28,7 @@ const TO_BACKEND_CATEGORY: Record<string, string> = {
   "Talent": "ACTOR",
   "Matches": "MATCH",
   "TV": "DRAMA",
-  "Shows": "SHOW", // Shows도 전시/공연으로 처리
+  "Shows": "SHOW",
   "Etc": "ETC"
 };
 
@@ -41,13 +42,15 @@ export default function CommentPage() {
 
   // Modal State
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
+  
   const [category, setCategory] = useState("Exhibitions & Shows");
   const [title, setTitle] = useState("");
   const [date, setDate] = useState<Date | null>(null);
   const [comment, setComment] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [existingUserImage, setExistingUserImage] = useState<string | null>(null);
 
-  // --- 1. DB에서 코멘트 목록 불러오기 ---
   useEffect(() => {
     const fetchComments = async () => {
       const token = localStorage.getItem("userToken");
@@ -62,7 +65,6 @@ export default function CommentPage() {
           const data = await res.json();
           const loadedItems = data.map((it: any) => ({
             id: it.id,
-            // 백엔드 코드(EXHIBITION)가 오면 그냥 보여주거나, 필요하면 다시 한글로 변환 가능
             category: it.category, 
             title: it.title,
             date: it.date_str || it.date,
@@ -71,42 +73,36 @@ export default function CommentPage() {
             userImageUrl: it.user_image || null,
             likes: it.likes_count || 0,
             isOwner: it.is_owner,
+            isLiked: it.is_liked,
+            nickname: it.nickname || it.author_name || it.username || "Unknown",
           }));
           setItems(loadedItems);
+
+          const initialLikedIds = new Set<number>();
+          loadedItems.forEach((item: any) => {
+            if (item.isLiked) initialLikedIds.add(item.id);
+          });
+          setLikedIds(initialLikedIds);
         }
-      } catch (e) {
-        console.error("Failed to load comments:", e);
-      }
+      } catch (e) { console.error(e); }
     };
     fetchComments();
   }, []);
 
-  // --- 2. 탭 필터링 ---
   const visibleItems = useMemo(() => {
-    if (tab === "MY") {
-      return items.filter((it) => it.isOwner);
-    } else {
-      return items.filter((it) => !it.isOwner);
-    }
+    return tab === "MY" ? items.filter((it) => it.isOwner) : items.filter((it) => !it.isOwner);
   }, [items, tab]);
 
   const handleLikeToggle = async (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
-    
-    // UI 즉시 반영 (Optimistic Update)
     const isLiked = likedIds.has(id);
     const newLikedIds = new Set(likedIds);
     if (isLiked) newLikedIds.delete(id);
     else newLikedIds.add(id);
     setLikedIds(newLikedIds);
     
-    setItems((prev) =>
-      prev.map((it) =>
-        it.id === id ? { ...it, likes: it.likes + (isLiked ? -1 : 1) } : it
-      )
-    );
+    setItems((prev) => prev.map((it) => it.id === id ? { ...it, likes: it.likes + (isLiked ? -1 : 1) } : it));
 
-    // 서버에 좋아요 요청 전송
     const token = localStorage.getItem("userToken");
     if (token) {
       try {
@@ -121,6 +117,29 @@ export default function CommentPage() {
   const toggleMenu = (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
     setMenuOpenId((prev) => (prev === id ? null : id));
+  };
+
+  const handleEdit = (e: React.MouseEvent, item: CommentItem) => {
+    e.stopPropagation();
+    setMenuOpenId(null);
+    setEditId(item.id);
+    setCategory(item.category); 
+    setTitle(item.title);
+    setComment(item.contentPreview);
+    setExistingUserImage(item.userImageUrl);
+    setFile(null);
+
+    if (item.date) {
+        const parts = item.date.split('.');
+        if(parts.length === 3) {
+            setDate(new Date(Number(parts[0]), Number(parts[1])-1, Number(parts[2])));
+        } else {
+            setDate(new Date());
+        }
+    } else {
+        setDate(new Date());
+    }
+    setIsAddOpen(true);
   };
 
   const deleteItem = async (e: React.MouseEvent, id: number) => {
@@ -138,25 +157,24 @@ export default function CommentPage() {
         } else {
             alert("삭제 실패");
         }
-    } catch(e) {
-        console.error(e);
-    }
+    } catch(e) { console.error(e); }
     setMenuOpenId(null);
   };
 
   const openAdd = () => {
     setMenuOpenId(null);
+    setEditId(null);
     setCategory("Exhibitions & Shows");
     setTitle("");
     setDate(null);
     setComment("");
     setFile(null);
+    setExistingUserImage(null);
     setIsAddOpen(true);
   };
 
   const closeAdd = () => setIsAddOpen(false);
 
-  // --- 3. 코멘트 업로드 ---
   const handleAddSubmit = async (payload: NewCommentPayload) => {
     const token = localStorage.getItem("userToken");
     if (!token) {
@@ -169,83 +187,79 @@ export default function CommentPage() {
     const dd = String(payload.date.getDate()).padStart(2, "0");
     const dateStr = `${yyyy}-${mm}-${dd}`;
 
-    // ✅ [핵심 수정] 카테고리 변환 (Exhibitions & Shows -> EXHIBITION)
-    // 매핑에 없으면 기본값 ETC
     const backendCategory = TO_BACKEND_CATEGORY[payload.category] || "ETC";
 
     const formData = new FormData();
-    formData.append("category", backendCategory); // 변환된 값 전송
+    formData.append("category", backendCategory);
     formData.append("title", payload.title);
     formData.append("date", dateStr);
     formData.append("content", payload.comment);
     
-    // ✅ [안전 장치] 빈 문자열("")이면 보내지 않음 (URLField 에러 방지)
     if (payload.posterUrl) {
         formData.append("poster_url", payload.posterUrl);
     }
     
-    if (payload.file) {
+    // ✅ [수정] 파일 처리 로직 변경
+    if (payload.isImageDeleted) {
+        // 이미지를 삭제한 경우, 빈 문자열을 보내서 서버에서 지우도록 요청
+        formData.append("user_image", ""); 
+    } else if (payload.file) {
+        // 새 파일이 있는 경우
         formData.append("user_image", payload.file);
     }
 
+    const url = editId ? `${BACKEND_URL}/api/posts/${editId}/` : `${BACKEND_URL}/api/posts/`;
+    const method = editId ? "PUT" : "POST";
+
     try {
-        const res = await fetch(`${BACKEND_URL}/api/posts/`, {
-            method: "POST",
+        const res = await fetch(url, {
+            method: method,
             headers: { Authorization: `Token ${token}` },
             body: formData,
         });
 
         if (res.ok) {
-            const newServerItem = await res.json();
+            const newItemData = await res.json();
             const newItem: CommentItem = {
-                id: newServerItem.id,
-                category: newServerItem.category,
-                title: newServerItem.title,
-                date: newServerItem.date_str || dateStr.replace(/-/g, '.'),
-                contentPreview: newServerItem.content,
-                posterUrl: newServerItem.poster_url,
-                userImageUrl: newServerItem.user_image,
-                likes: 0,
+                id: newItemData.id,
+                category: newItemData.category,
+                title: newItemData.title,
+                date: newItemData.date_str || dateStr.replace(/-/g, '.'),
+                contentPreview: newItemData.content,
+                posterUrl: newItemData.poster_url,
+                userImageUrl: newItemData.user_image,
+                likes: newItemData.likes_count || 0,
                 isOwner: true,
+                isLiked: false,
+                nickname: newItemData.nickname || "Me", 
             };
-            setItems((prev) => [newItem, ...prev]);
+
+            if (editId) {
+                setItems(prev => prev.map(it => it.id === editId ? newItem : it));
+            } else {
+                setItems(prev => [newItem, ...prev]);
+            }
             closeAdd();
         } else {
-            const errData = await res.json();
-            console.error("Upload failed", errData);
-            alert(`업로드 실패: ${JSON.stringify(errData)}`);
+            alert("저장 실패");
         }
     } catch (e) {
-        console.error("Network error", e);
-        alert("네트워크 오류가 발생했습니다.");
+        console.error(e);
+        alert("네트워크 오류");
     }
   };
 
   return (
     <div className={styles.page}>
       <div className={styles.subTabWrap}>
-        <button
-          type="button"
-          className={`${styles.subTab} ${tab === "MY" ? styles.active : ""}`}
-          onClick={() => setTab("MY")}
-        >
-          My Comment
-        </button>
-        <button
-          type="button"
-          className={`${styles.subTab} ${tab === "FRIENDS" ? styles.active : ""}`}
-          onClick={() => setTab("FRIENDS")}
-        >
-          Friends
-        </button>
+        <button className={`${styles.subTab} ${tab === "MY" ? styles.active : ""}`} onClick={() => setTab("MY")}>My Comment</button>
+        <button className={`${styles.subTab} ${tab === "FRIENDS" ? styles.active : ""}`} onClick={() => setTab("FRIENDS")}>Friends</button>
       </div>
 
       <div className={styles.list}>
         {visibleItems.length === 0 && (
           <div style={{ textAlign: "center", padding: "40px", color: "#888" }}>
-            {tab === "MY" 
-                ? "아직 작성한 코멘트가 없습니다." 
-                : "친구들의 코멘트가 없습니다."}
+            {tab === "MY" ? "아직 작성한 코멘트가 없습니다." : "친구들의 코멘트가 없습니다."}
           </div>
         )}
         {visibleItems.map((it) => {
@@ -256,7 +270,6 @@ export default function CommentPage() {
               className={styles.card}
               onClick={() => navigate(`/comment/${it.id}`)}
             >
-              {/* 포스터 이미지 (없으면 숨김) */}
               <img
                 className={styles.poster}
                 src={it.posterUrl || "/src/assets/items/placeholder.png"}
@@ -265,6 +278,13 @@ export default function CommentPage() {
               />
 
               <div className={styles.content}>
+                
+                {!it.isOwner && (
+                    <div className={styles.authorBadge}>
+                        By. {it.nickname}
+                    </div>
+                )}
+
                 <div className={styles.topRow}>
                   <div className={styles.meta}>
                     <div className={styles.category}>{it.category}</div>
@@ -272,54 +292,44 @@ export default function CommentPage() {
                     <div className={styles.date}>{it.date}</div>
                   </div>
 
-                  <div className={styles.rightTop}>
-                    <button
-                      type="button"
-                      className={styles.moreBtn}
-                      onClick={(e) => toggleMenu(e, it.id)}
-                    >
-                      •••
-                    </button>
-                    {menuOpenId === it.id && (
-                      <button
+                  {it.isOwner && (
+                    <div className={styles.rightTop}>
+                        <button
                         type="button"
-                        className={styles.deleteBtn}
-                        onClick={(e) => deleteItem(e, it.id)}
-                      >
-                        DELETE
-                      </button>
-                    )}
-                  </div>
+                        className={styles.moreBtn}
+                        onClick={(e) => toggleMenu(e, it.id)}
+                        >
+                        •••
+                        </button>
+                        {menuOpenId === it.id && (
+                        <div className={styles.menuDropdown}>
+                            <button
+                            type="button"
+                            className={`${styles.menuItem} ${styles.editBtn}`}
+                            onClick={(e) => handleEdit(e, it)}
+                            >
+                            EDIT
+                            </button>
+                            <button
+                            type="button"
+                            className={`${styles.menuItem} ${styles.deleteBtn}`}
+                            onClick={(e) => deleteItem(e, it.id)}
+                            >
+                            DELETE
+                            </button>
+                        </div>
+                        )}
+                    </div>
+                  )}
                 </div>
 
-                {/* 유저가 올린 직찍 */}
-                {it.userImageUrl && (
-                  <div style={{ marginTop: "16px", marginBottom: "8px" }}>
-                    <img
-                      src={it.userImageUrl}
-                      alt="User Upload"
-                      style={{
-                        maxWidth: "100%",
-                        maxHeight: "300px",
-                        borderRadius: "12px",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </div>
-                )}
-
+                {/* ✅ [수정] 여기서 userImageUrl 렌더링 부분 삭제함 (리스트에서 사진 숨김) */}
                 <p className={styles.preview}>{it.contentPreview}</p>
               </div>
 
-              <div
-                className={styles.likeBox}
-                onClick={(e) => handleLikeToggle(e, it.id)}
-              >
+              <div className={styles.likeBox} onClick={(e) => handleLikeToggle(e, it.id)}>
                 <button className={styles.heartButton}>
-                  <svg
-                    className={`${styles.heart} ${isLiked ? styles.liked : ""}`}
-                    viewBox="0 0 24 24"
-                  >
+                  <svg className={`${styles.heart} ${isLiked ? styles.liked : ""}`} viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                   </svg>
                 </button>
@@ -330,13 +340,8 @@ export default function CommentPage() {
         })}
       </div>
 
-      <button type="button" className={styles.fab} onClick={openAdd}>
-        Add
-      </button>
-
-      <footer className={styles.footer}>
-        © 2026 D_MARA. All Rights Reserved.
-      </footer>
+      <button type="button" className={styles.fab} onClick={openAdd}>Add</button>
+      <footer className={styles.footer}>© 2026 D_MARA. All Rights Reserved.</footer>
 
       <AddCommentModal
         isOpen={isAddOpen}
@@ -352,6 +357,7 @@ export default function CommentPage() {
         setComment={setComment}
         file={file}
         setFile={setFile}
+        existingImage={existingUserImage} 
       />
     </div>
   );

@@ -11,6 +11,7 @@ import BACKEND_URL from "@/config";
 
 export default function OnboardingPage() {
   const pageRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // --- 상태 관리 ---
   const [allItems, setAllItems] = useState<CategoryItem[]>([]);
@@ -40,7 +41,7 @@ export default function OnboardingPage() {
           const pData = await profileRes.json();
           setUsername(pData.nickname || "User");
           setIam(pData.bio || "");
-          if (pData.profile_image) setProfileImageUrl(pData.profile_image);
+          if (pData.image) setProfileImageUrl(pData.image);
         } else {
           const uRes = await fetch(`${BACKEND_URL}/dj-rest-auth/user/`, {
             headers: { Authorization: `Token ${token}` },
@@ -75,6 +76,37 @@ export default function OnboardingPage() {
   };
 
   // --- 2. 액션 함수들 ---
+  const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const token = localStorage.getItem("userToken");
+    if (!token) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+        const res = await fetch(`${BACKEND_URL}/api/hobbies/profile/me/`, {
+            method: "PATCH",
+            headers: { Authorization: `Token ${token}` },
+            body: formData,
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            if (data.image) {
+                setProfileImageUrl(data.image);
+                window.dispatchEvent(new Event("profileUpdated"));
+            }
+        } else {
+            alert("이미지 업로드 실패");
+        }
+    } catch (error) {
+        console.error("Profile Image Upload Error:", error);
+        alert("업로드 중 오류가 발생했습니다.");
+    }
+  };
 
   const addItemToCategory = async (category: CategoryKey, itemData: any) => {
     const token = localStorage.getItem("userToken");
@@ -114,20 +146,26 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleOrderChange = (orderedCategoryItems: CategoryItem[]) => {
+  const handleOrderChange = async (orderedCategoryItems: CategoryItem[]) => {
     if (!openCategory) return;
-
-    // Find all items that were part of the original category view
     const originalCategoryItems = getItemsByCategory(openCategory);
     const originalCategoryItemIds = new Set(originalCategoryItems.map(item => item.id));
-    
-    // Start with items that are NOT in the category we're editing
     const otherItems = allItems.filter(item => !originalCategoryItemIds.has(item.id));
-    
-    // Add the newly ordered items
     const newAllItems = [...otherItems, ...orderedCategoryItems];
-    
     setAllItems(newAllItems);
+
+    const token = localStorage.getItem("userToken");
+    if (!token) return;
+    const orderedIds = orderedCategoryItems.map(item => item.id);
+    try {
+      await fetch(`${BACKEND_URL}/api/hobbies/items/reorder/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Token ${token}` },
+        body: JSON.stringify({ ordered_ids: orderedIds }),
+      });
+    } catch (e) {
+      console.error("순서 저장 실패:", e);
+    }
   };
   
   const saveNickname = async () => {
@@ -143,6 +181,7 @@ export default function OnboardingPage() {
       if (res.ok) {
         setUsername(responseData.nickname);
         setIsEditingNickname(false);
+        window.dispatchEvent(new Event("profileUpdated"));
       } else {
         alert("Failed to save nickname: " + JSON.stringify(responseData));
       }
@@ -159,7 +198,7 @@ export default function OnboardingPage() {
       const res = await fetch(`${BACKEND_URL}/api/hobbies/profile/me/`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Token ${token}` },
-        body: JSON.stringify({ bio: iamDraft.trim() }),
+        body: JSON.stringify({ bio: iamDraft.trim() }), 
       });
       const responseData = await res.json();
       if (res.ok) {
@@ -213,22 +252,24 @@ export default function OnboardingPage() {
               <img src={profileImageUrl} alt="Profile" />
             </div>
             <div className={styles.profileEditBtnWrap}>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                accept="image/*"
+                onChange={handleProfileImageChange}
+              />
               <button
                 className={styles.profileEditBtn}
-                onClick={() => alert("프로필 사진 수정 기능 준비 중!")}
+                onClick={() => fileInputRef.current?.click()}
                 type="button"
                 aria-label="Edit profile picture"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  width="24" height="24" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" strokeWidth="2"
+                  strokeLinecap="round" strokeLinejoin="round"
                   className={styles.profileEditIcon}
                 >
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
@@ -249,9 +290,22 @@ export default function OnboardingPage() {
                 <button className={styles.inlineEditBtn} onClick={startEditingNickname}>Edit</button>
               </div>
             )}
+            
             {isEditingBio ? (
               <div className={styles.iamEditContainer}>
-                <input className={styles.iamInput} value={iamDraft} onChange={(e) => setIamDraft(e.target.value)} placeholder="Introduce yourself" autoFocus />
+                <textarea
+                  className={styles.iamInput} 
+                  value={iamDraft} 
+                  onChange={(e) => setIamDraft(e.target.value)} 
+                  placeholder="Introduce yourself" 
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault(); 
+                      saveBio(); 
+                    }
+                  }}
+                />
                 <button className={styles.iamSaveButton} onClick={saveBio}>Save</button>
               </div>
             ) : (
@@ -263,7 +317,8 @@ export default function OnboardingPage() {
           </div>
         </section>
 
-        {CATEGORIES.map((category) => (
+        {/* ✅ [핵심 수정] Matches 카테고리 제외 필터링 */}
+        {CATEGORIES.filter(category => category !== "Matches").map((category) => (
           <section key={category} className={styles.section}>
             <h2 className={styles.sectionTitle}>
               {category}

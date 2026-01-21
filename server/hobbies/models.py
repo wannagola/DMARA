@@ -35,14 +35,22 @@ def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
 
-# 2. 관심사 아이템 (Who am I 하단 박제용)
+# 2. 관심사 아이템
 class HobbyItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='hobbies')
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     title = models.CharField(max_length=200)
     subtitle = models.CharField(max_length=200, blank=True)
     image_url = models.URLField(blank=True, null=True) 
+    
+    # ✅ [추가] 순서를 저장할 필드 (기본값 0)
+    order = models.PositiveIntegerField(default=0)
+    
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # ✅ 데이터를 가져올 때 'order' 순서로 먼저 정렬하고, 같으면 최신순으로 정렬
+        ordering = ['order', '-created_at']
 
     def __str__(self):
         return f"{self.user} likes {self.title}"

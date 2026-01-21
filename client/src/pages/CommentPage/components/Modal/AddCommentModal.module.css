@@ -212,11 +212,50 @@
 .previewBox {
   margin-top: 26px;
   width: 100%;
-  /* Reduced height to give space */
   height: 200px;
   border-radius: 18px;
   background: #141414;
   overflow: hidden;
+  /* previewBox 아래 간격은 imageActions가 처리 */
+}
+
+/* ✅ 버튼들을 가로로 배치하기 위한 컨테이너 */
+.imageActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.uploadBtn {
+  font-size: 16px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.9);
+  background: var(--primary-color-a20);
+  border: 1px solid var(--primary-color-a55);
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  width: fit-content;
+}
+
+/* ✅ 삭제 버튼 스타일 */
+.removeBtn {
+  font-size: 16px;
+  font-weight: 800;
+  color: #ff4d4d; /* 빨간색 텍스트 */
+  background: rgba(255, 77, 77, 0.15); /* 연한 빨간 배경 */
+  border: 1px solid rgba(255, 77, 77, 0.5);
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.removeBtn:hover {
+  background: rgba(255, 77, 77, 0.25);
+}
+
+.file {
+  display: none;
 }
 
 .previewImg {

@@ -6,12 +6,13 @@ User = get_user_model()
 
 # 게시글 작성자 정보를 간단히 보여주기 위한 시리얼라이저
 class FeedUserSerializer(serializers.ModelSerializer):
-    # hobbies 앱의 프로필 이미지를 가져오기 위해 source 사용
     profile_image = serializers.ImageField(source='hobbies_profile.image', read_only=True)
+    # ✅ 닉네임도 user 객체 내부에서 사용할 수 있게 추가
+    nickname = serializers.ReadOnlyField(source='hobbies_profile.nickname') 
     
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'profile_image']
+        fields = ['id', 'username', 'email', 'profile_image', 'nickname']
 
 class PostSerializer(serializers.ModelSerializer):
     user = FeedUserSerializer(read_only=True)
@@ -20,12 +21,16 @@ class PostSerializer(serializers.ModelSerializer):
     is_owner = serializers.SerializerMethodField()
     date_str = serializers.SerializerMethodField()
 
+    # ✅ [핵심] 최상위 레벨에 nickname 필드 추가 (프론트엔드가 바로 읽을 수 있게)
+    nickname = serializers.ReadOnlyField(source='user.hobbies_profile.nickname')
+
     class Meta:
         model = Post
         fields = [
             'id', 'user', 'category', 'title', 'date', 'date_str',
             'content', 'poster_url', 'user_image', 'visibility',
-            'likes_count', 'is_liked', 'is_owner', 'created_at'
+            'likes_count', 'is_liked', 'is_owner', 'created_at',
+            'nickname' # ✅ 여기에 꼭 추가해야 합니다!
         ]
         read_only_fields = ['user', 'created_at', 'likes_count']
 

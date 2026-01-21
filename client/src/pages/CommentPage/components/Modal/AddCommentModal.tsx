@@ -10,7 +10,8 @@ export type NewCommentPayload = {
   comment: string;
   posterUrl: string;
   imagePreviewUrl: string | null;
-  file: File | null; // ✅ 서버 전송용 파일 객체 추가
+  file: File | null;
+  isImageDeleted: boolean; // ✅ 이미지 삭제 여부 플래그 추가
 };
 
 type Props = {
@@ -27,6 +28,7 @@ type Props = {
   setComment: (value: string) => void;
   file: File | null;
   setFile: (file: File | null) => void;
+  existingImage?: string | null;
 };
 
 const CATEGORY_OPTIONS = [
@@ -44,8 +46,8 @@ const BACKEND_CATEGORY_MAP: Record<string, string> = {
   "Exhibitions & Shows": "EXHIBITION",
   Movie: "MOVIE",
   Music: "MUSIC",
-  Sports: "SPORTS",
-  Talent: "ACTOR",
+  "Sports": "SPORTS",
+  "Talent": "ACTOR",
   Matches: "MATCH",
   TV: "DRAMA",
   Shows: "EXHIBITION",
@@ -65,28 +67,41 @@ export default function AddCommentModal({
   setComment,
   file,
   setFile,
+  existingImage,
 }: Props) {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [isListOpen, setIsListOpen] = useState(false);
   const [selectedPoster, setSelectedPoster] = useState("");
+  const [isImageDeleted, setIsImageDeleted] = useState(false); // ✅ 삭제 상태 관리
   const listRef = useRef<HTMLDivElement>(null);
 
+  // ✅ 미리보기 로직 수정: 삭제됨(isImageDeleted) 상태가 아닐 때만 표시
   const previewUrl = useMemo(() => {
-    if (!file) return null;
-    return URL.createObjectURL(file);
-  }, [file]);
+    if (isImageDeleted) return null;
+    if (file) return URL.createObjectURL(file);
+    if (existingImage) return existingImage;
+    return null;
+  }, [file, existingImage, isImageDeleted]);
 
   useEffect(() => {
     return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      if (file && previewUrl && previewUrl !== existingImage) {
+        URL.revokeObjectURL(previewUrl);
+      }
     };
-  }, [previewUrl]);
+  }, [previewUrl, file, existingImage]);
 
-  // 검색 로직
+  // 모달 열릴 때 삭제 상태 초기화
   useEffect(() => {
-    const fetchSearch = async () => {
+    if (isOpen) {
+        setIsImageDeleted(false);
+        setIsListOpen(false);
+    }
+  }, [isOpen]);
+
+  const fetchSearch = async () => {
       const query = title.trim();
-      if (!query) {
+      if (!query || !isOpen) {
         setSuggestions([]);
         return;
       }
@@ -114,11 +129,12 @@ export default function AddCommentModal({
       } catch (e) {
         console.error(e);
       }
-    };
+  };
 
+  useEffect(() => {
     const debounce = setTimeout(fetchSearch, 300);
     return () => clearTimeout(debounce);
-  }, [title, category]);
+  }, [title, category, isOpen]);
 
   const handleSelect = (item: any) => {
     setTitle(item.title);
@@ -139,15 +155,27 @@ export default function AddCommentModal({
       comment: comment.trim(),
       posterUrl: selectedPoster,
       imagePreviewUrl: previewUrl,
-      file: file, // ✅ 파일 객체 전달
+      file: file,
+      isImageDeleted, // ✅ 삭제 여부 전달
     });
     setSelectedPoster("");
     setSuggestions([]);
   };
 
-  useEffect(() => {
-    if (!isOpen) setIsListOpen(false);
-  }, [isOpen]);
+  // ✅ 이미지 삭제 핸들러
+  const handleDeleteImage = () => {
+      setFile(null);
+      setIsImageDeleted(true);
+  };
+
+  // ✅ 새 파일 선택 핸들러
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newFile = e.target.files?.[0];
+      if (newFile) {
+          setFile(newFile);
+          setIsImageDeleted(false); // 새 파일 올리면 삭제 취소
+      }
+  };
 
   if (!isOpen) return null;
 
@@ -175,7 +203,6 @@ export default function AddCommentModal({
                 value={category}
                 onChange={(e) => {
                   setCategory(e.target.value);
-                  setTitle("");
                   setSuggestions([]);
                 }}
               >
@@ -286,15 +313,30 @@ export default function AddCommentModal({
                   <div className={styles.previewEmpty} />
                 )}
               </div>
-              <label className={styles.uploadBtn}>
-                <input
-                  className={styles.file}
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                />
-                Upload
-              </label>
+              
+              <div className={styles.imageActions}>
+                  <label className={styles.uploadBtn}>
+                    <input
+                      className={styles.file}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                    Upload
+                  </label>
+                  
+                  {/* ✅ 이미지가 있을 때만 삭제 버튼 표시 */}
+                  {previewUrl && (
+                      <button 
+                        type="button" 
+                        className={styles.removeBtn} 
+                        onClick={handleDeleteImage}
+                      >
+                        Remove
+                      </button>
+                  )}
+              </div>
+
             </div>
           </div>
           <div className={styles.actions}>

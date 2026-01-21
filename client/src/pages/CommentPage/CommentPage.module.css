@@ -57,8 +57,8 @@
   top: 0;
   width: 92px;
   height: 100%;
-  background: var(--primary-color-a45); /* Base theme color with opacity */
-  filter: brightness(1.5); /* Make it brighter */
+  background: var(--primary-color-a45);
+  filter: brightness(1.5);
   pointer-events: none;
 }
 
@@ -82,13 +82,39 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  
+  /* ✅ [중요 수정] 컨텐츠가 카드를 뚫고 나가지 않게 함 */
+  min-width: 0; 
+  overflow: hidden; 
 }
 
+/* ✅ [추가] 작성자 닉네임 배지 */
+.authorBadge {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--primary-color);
+  margin-bottom: 8px; /* 카테고리와의 간격 */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* --- 상단 영역 --- */
 .topRow {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
+  width: 100%; /* 너비 꽉 채우기 */
+}
+
+/* ✅ [중요 수정] 제목 영역 설정 강화 */
+.meta {
+  display: flex;
+  flex-direction: column;
+  flex: 1;        /* 남은 공간 차지 */
+  min-width: 0;   /* 줄어들 수 있게 허용 */
+  overflow: hidden; /* 내부 텍스트가 넘치면 숨김 처리 */
 }
 
 .category {
@@ -102,9 +128,13 @@
   font-size: 44px;
   font-weight: 900;
   line-height: 1.05;
+  
+  /* ✅ 말줄임표 설정 */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: block;
+  max-width: 100%; /* 부모(.meta) 너비를 넘지 않게 함 */
 }
 
 .date {
@@ -113,26 +143,28 @@
   font-weight: 800;
   opacity: 0.95;
 }
+/* ------------------------- */
 
 .preview {
   margin-top: 18px;
-  font-size: 16px; /* Reduced font size */
-  font-weight: 400; /* Reduced font weight */
+  font-size: 16px;
+  font-weight: 400;
   line-height: 1.4;
 
-  /* 멀티라인 줄임표 (표준 속성도 같이 정의) */
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   line-clamp: 2;
-
   overflow: hidden;
 }
 
 /* 우상단 ... / DELETE */
 .rightTop {
   position: relative;
-  flex: 0 0 auto;
+  flex: 0 0 auto; /* ✅ 절대 줄어들지 않음 */
+  display: flex;
+  align-items: flex-start;
+  z-index: 5; /* 제목보다 위에 오도록 */
 }
 
 .moreBtn {
@@ -144,25 +176,53 @@
   cursor: pointer;
   padding: 6px 10px;
   border-radius: 10px;
+  line-height: 1;
 }
 
 .moreBtn:hover {
   background: rgba(255, 255, 255, 0.08);
 }
 
-.deleteBtn {
+/* ✅ 메뉴 드롭다운 컨테이너 (새로 추가) */
+.menuDropdown {
   position: absolute;
-  top: 44px;
+  top: 40px;
   right: 0;
-  width: 150px;
-  height: 44px;
-  border-radius: 999px;
-  border: 2px solid rgba(255, 255, 255, 0.85);
   background: #ffffff;
-  color: #ff2a2a;
-  font-weight: 900;
-  font-size: 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 120px;
+  z-index: 20;
+}
+
+/* ✅ 메뉴 내부 버튼 공통 스타일 */
+.menuItem {
+  border: none;
+  background: transparent;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 800;
   cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.menuItem:hover {
+  background: #f0f0f0;
+}
+
+/* Edit 버튼 (검은 글씨) */
+.editBtn {
+  color: #333;
+  border-bottom: 1px solid #eee;
+}
+
+/* Delete 버튼 (빨간 글씨) */
+.deleteBtn {
+  color: #ff2a2a;
 }
 
 /* 좋아요 영역 */
@@ -222,6 +282,9 @@
   font-weight: 900;
   cursor: pointer;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  
+  /* ✅ [추가] 다른 모든 요소보다 맨 앞에 오도록 높은 값 설정 */
+  z-index: 990; 
 }
 
 .footer {
@@ -255,6 +318,7 @@
   }
   .content {
     padding-right: 24px;
+    min-width: auto;
   }
   .card::after {
     display: none;

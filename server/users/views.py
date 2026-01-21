@@ -3,22 +3,106 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from django.db.models import Q
 from hobbies.serializers import ProfileSerializer
-from .models import Profile
+from hobbies.models import Profile
+import requests
+from django.http import HttpResponse
+from rest_framework.permissions import AllowAny
+from .models import Profile, Notification # Notification 추가
+from .serializers import NotificationSerializer # 추가
 
+User = get_user_model()
 
-class UserProfileView(RetrieveAPIView):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+# 헬퍼 함수
+def get_user_info(target_user, request=None):
+    display_name = target_user.username
+    img_url = None
+    is_following = False # 기본값
+
+    # 1. 프로필 정보 추출
+    if hasattr(target_user, 'hobbies_profile'):
+        if target_user.hobbies_profile.nickname:
+            display_name = target_user.hobbies_profile.nickname
+        
+        if target_user.hobbies_profile.image:
+            if request:
+                img_url = request.build_absolute_uri(target_user.hobbies_profile.image.url)
+            else:
+                img_url = target_user.hobbies_profile.image.url
+    
+    # 2. 내가 이 사람을 팔로우 중인지 확인
+    if request and request.user.is_authenticated:
+        # 내 팔로잉 목록에 target_user가 있는지 확인
+        is_following = request.user.profile.followings.filter(id=target_user.id).exists()
+            
+    return {
+        "id": target_user.id,
+        "username": target_user.username,
+        "display_name": display_name,
+        "profile_image": img_url,
+        "is_following": is_following, # ✅ 프론트엔드 버튼 상태 결정용
+    }
+
+# ✅ 1. 특정 유저 프로필 가져오기 (APIView로 변경하여 안정성 확보)
+class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get_object(self):
-        user_id = self.kwargs.get('user_id')
-        user = get_object_or_404(User, id=user_id)
-        return get_object_or_404(Profile, user=user)
+    def get(self, request, user_id):
+        if user_id == 'me': 
+             user = request.user
+        else:
+             user = get_object_or_404(User, id=user_id)
 
+        # 1. Hobbies 프로필(실제 데이터) 가져오기
+        nickname = user.username
+        bio = ""
+        img_url = None
+        
+        if hasattr(user, 'hobbies_profile'):
+            hp = user.hobbies_profile
+            nickname = hp.nickname or user.username
+            # 자기소개 필드명 호환성 처리 (bio or introduction)
+            bio = getattr(hp, 'bio', '') or getattr(hp, 'introduction', '')
+            if hp.image:
+                img_url = request.build_absolute_uri(hp.image.url)
+        
+        # 2. 팔로잉 상태 확인 (Users 프로필)
+        is_following = False
+        if request.user.is_authenticated and hasattr(request.user, 'profile'):
+             is_following = request.user.profile.followings.filter(id=user.id).exists()
 
+        response_data = {
+            "username": user.username,
+            "nickname": nickname,
+            "bio": bio,
+            "image": img_url,
+            "profile_image": img_url,
+            "is_following": is_following,
+        }
+        return Response(response_data)
+
+# ✅ [추가] 내 알림 목록 가져오기 & 읽음 처리
+class NotificationView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # 내 알림 최신순 조회
+        notifications = Notification.objects.filter(recipient=request.user)
+        serializer = NotificationSerializer(notifications, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        # 알림 읽음 처리 (전체 읽음 혹은 특정 ID)
+        notif_id = request.data.get('id')
+        if notif_id:
+            Notification.objects.filter(id=notif_id, recipient=request.user).update(is_read=True)
+        else:
+            Notification.objects.filter(recipient=request.user).update(is_read=True)
+        return Response({"message": "Marked as read"})
+
+# ✅ [수정] 팔로우 토글 뷰: 팔로우 성공 시 알림 생성 코드 추가
 class FollowToggleView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -27,73 +111,105 @@ class FollowToggleView(APIView):
         target_user = get_object_or_404(User, id=user_id)
 
         if me == target_user:
-            return Response({"message": "You cannot follow yourself."}, status=400)
+            return Response({"message": "Self follow error"}, status=400)
 
-        # Check if the user is already following
         if target_user in me.profile.followings.all():
-            # Unfollow
             me.profile.followings.remove(target_user)
-            return Response({"message": f"You have unfollowed {target_user.username}."})
+            return Response({"message": "Unfollowed"})
         else:
-            # Follow
             me.profile.followings.add(target_user)
-            return Response({"message": f"You are now following {target_user.username}."})
+            
+            # 🚀 [추가] 알림 생성 로직 (이미 알림이 없을 때만 생성 추천)
+            Notification.objects.create(
+                recipient=target_user,
+                sender=me,
+                notification_type='follow'
+            )
+            
+            return Response({"message": "Followed"})
 
+# 3. 내가 팔로우하는 목록
 class FollowingListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         me = request.user
         following_users = me.profile.followings.all()
-        serializer = SimpleUserSerializer(following_users, many=True)
-        return Response(serializer.data)
+        data = [get_user_info(u, request) for u in following_users]
+        return Response(data)
 
-
+# 4. 친한 친구 후보 (팔로워+팔로잉)
 class CloseFriendCandidatesView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         me = request.user
-        
-        # 1. 내가 팔로우하는 사람들 (Following)
-        # 내 프로필의 followings 목록에 있는 유저들
         group_a = me.profile.followings.all()
-        
-        # 2. 나를 팔로우하는 사람들 (Follower)
-        # '어떤 프로필(profile)'의 followings 목록에 '나(me)'가 포함된 경우 -> 그 프로필의 주인(User)
         group_b = User.objects.filter(profile__followings=me)
-        
-        # 3. 합치기 (Union) & 중복 제거 (Distinct)
-        # '|' 기호가 합집합 연산을 수행하며, distinct()가 중복을 제거합니다.
         candidates = (group_a | group_b).distinct()
-        
-        # 4. JSON으로 변환해서 응답
-        serializer = SimpleUserSerializer(candidates, many=True)
-        return Response(serializer.data)
+        data = [get_user_info(u, request) for u in candidates]
+        return Response(data)
 
+# 5. 나를 팔로우하는 목록 & 삭제
 class ManageFollowerView(APIView):
     permission_classes = [IsAuthenticated]
 
-    # 1. 나를 팔로우하는 사람 목록 보기 (내 팬클럽 명단)
     def get(self, request):
         me = request.user
-        # '어떤 프로필'의 followings에 '내(me)'가 들어있는 경우 -> 그게 바로 나의 팔로워
         followers = User.objects.filter(profile__followings=me)
-        
-        serializer = SimpleUserSerializer(followers, many=True)
-        return Response(serializer.data)
+        data = [get_user_info(u, request) for u in followers]
+        return Response(data)
 
-    # 2. 팔로워 끊어내기 (강퇴)
     def post(self, request):
         me = request.user
-        target_id = request.data.get('user_id') # 끊고 싶은 사람의 ID
-        
-        # 그 사람이 실제로 존재하는지 확인
+        target_id = request.data.get('user_id')
         target_user = get_object_or_404(User, id=target_id)
         
-        # 핵심 로직: 그 사람의 팔로잉 목록에서 '나'를 삭제함
         if me in target_user.profile.followings.all():
             target_user.profile.followings.remove(me)
-            return Response({"message": "해당 팔로워를 삭제했습니다."})
+            return Response({"message": "Removed follower."})
         else:
-            return Response({"message": "그 사람은 당신을 팔로우하고 있지 않습니다."}, status=400)
+            return Response({"message": "Not a follower."}, status=400)
+
+# 6. 유저 검색
+class UserSearchView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        query = request.GET.get('username', '')
+        if not query:
+            return Response([])
+        
+        users = User.objects.filter(
+            Q(username__icontains=query) | 
+            Q(hobbies_profile__nickname__icontains=query)
+        ).distinct()
+        
+        data = [get_user_info(u, request) for u in users]
+        return Response(data)
+
+class ImageProxyView(APIView):
+    permission_classes = [AllowAny] # 로그인 안 해도 이미지 볼 수 있게
+
+    def get(self, request):
+        url = request.GET.get('url')
+        if not url:
+            return HttpResponse(status=400)
+        
+        try:
+            # 1. 서버가 대신 이미지 다운로드
+            response = requests.get(url, stream=True, timeout=5)
+            
+            # 2. 브라우저에게 그대로 전달 (Content-Type 유지)
+            django_response = HttpResponse(
+                response.content, 
+                content_type=response.headers.get('Content-Type', 'image/jpeg')
+            )
+            
+            # 3. 🚀 핵심: CORS 모든 도메인 허용 헤더 부착
+            django_response['Access-Control-Allow-Origin'] = '*'
+            return django_response
+            
+        except Exception as e:
+            print(f"Proxy Error: {e}")
+            return HttpResponse(status=500)
