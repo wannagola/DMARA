@@ -1,0 +1,12 @@
+Django
+djangorestframework
+django-cors-headers
+requests
+ytmusicapi
+dj-rest-auth
+django-allauth
+pillow
+psycopg2-binary
+djangorestframework-simplejwt
+PyJWT
+cryptography

@@ -6,21 +6,18 @@ from rest_framework.views import APIView
 from datetime import datetime, timedelta
 
 # 모델 및 시리얼라이저
-from .models import HobbyItem, Post, Profile
-from .serializers import HobbyItemSerializer, PostSerializer, ProfileSerializer
+from .models import HobbyItem, Profile
+from .serializers import HobbyItemSerializer, ProfileSerializer
 
 # 검색 Utils
 from .utils import search_tmdb, search_spotify, search_sports, search_manual
 from .utils_culture import search_performances
 from .utils_match import (
-    get_football_matches, 
-    get_baseball_matches, 
-    get_basketball_matches, 
-    get_f1_matches, 
-    get_volleyball_matches
+    get_football_matches, get_baseball_matches, get_basketball_matches, 
+    get_f1_matches, get_volleyball_matches
 )
 
-# ★ [복구] 구글 로그인 관련 Import
+# 구글 로그인
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
@@ -66,37 +63,7 @@ class HobbyItemViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-# 3. 게시글 (Comment & 경기 기록)
-class PostViewSet(viewsets.ModelViewSet):
-    serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-    def get_queryset(self):
-        mode = self.request.query_params.get('mode', 'all')
-        if mode == 'my':
-            return Post.objects.filter(user=self.request.user).order_by('-date')
-        return Post.objects.all().order_by('-date')
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def perform_destroy(self, instance):
-        if instance.user != self.request.user:
-            raise PermissionDenied("본인의 글만 삭제할 수 있습니다.")
-        instance.delete()
-
-    @action(detail=True, methods=['POST'], permission_classes=[permissions.IsAuthenticated])
-    def like(self, request, pk=None):
-        post = self.get_object()
-        user = request.user
-        if post.likes.filter(id=user.id).exists():
-            post.likes.remove(user)
-            return Response({'status': 'unliked', 'like_count': post.likes.count()})
-        else:
-            post.likes.add(user)
-            return Response({'status': 'liked', 'like_count': post.likes.count()})
-
-# 4. 검색 API (MATCH 포함)
+# 3. 검색 API
 class ExternalSearchView(APIView):
     def get(self, request):
         query = request.GET.get('query')
@@ -110,18 +77,14 @@ class ExternalSearchView(APIView):
         
         if category in ['MUSIC', 'IDOL']:
             result = search_spotify(query, category)
-
         elif category in ['MOVIE', 'DRAMA', 'OTT', 'ACTOR']:
             result = search_tmdb(query, category)
-
         elif category == 'SPORTS':
             result = search_sports(query)
-
         elif category == 'EXHIBITION' or category == 'CULTURE':
             past_date = (datetime.today() - timedelta(days=3650)).strftime('%Y%m%d')
             future_date = (datetime.today() + timedelta(days=365)).strftime('%Y%m%d')
             result = search_performances(past_date, future_date, query)
-
         elif category == 'MATCH':
             if not date:
                 date = datetime.today().strftime('%Y-%m-%d')
@@ -133,20 +96,16 @@ class ExternalSearchView(APIView):
             all_games = football + baseball + basketball + f1 + volleyball
 
             if query:
-                query_lower = query.lower() # 대소문자 무시
-                all_games = [
-                    game for game in all_games 
-                    if query_lower in game['home'].lower() or query_lower in game['away'].lower()
-                ]
+                query_lower = query.lower()
+                all_games = [g for g in all_games if query_lower in g['home'].lower() or query_lower in g['away'].lower()]
 
             result = sorted(all_games, key=lambda x: x['time'])
-
         elif category in ['FOOD', 'ETC']:
             result = search_manual(query, category)
             
         return Response({"results": result})
 
-# 구글 로그인 뷰
+# 구글 로그인
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     callback_url = "http://127.0.0.1:8000/api/hobbies/google/callback/" 

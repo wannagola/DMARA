@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CloseFriendCandidatesView, ManageFollowerView, FollowToggleView, FollowingListView
+from .views import CloseFriendCandidatesView, ManageFollowerView, FollowToggleView, FollowingListView, UserProfileView
 
 urlpatterns = [
     # 이 주소로 요청하면 후보 리스트를 줍니다
